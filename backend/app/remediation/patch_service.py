@@ -46,14 +46,21 @@ def apply_patch(settings: Settings, patch: PatchProposal, incident_type: str) ->
     if sha256_text(proposed) != patch.proposed_sha256:
         raise UnsafeOperationError("Stored patch content does not match its recorded hash.")
 
-    shutil.copyfile(target, settings.patches_dir / f"{patch.patch_id}.orig")
-    write_text_atomic(target, proposed)
-
     git = workspace_git(settings)
+    if not git.is_clean():
+        raise ConflictError("Pipeline repository has uncommitted changes; cannot apply the patch.")
+    shutil.copyfile(target, settings.patches_dir / f"{patch.patch_id}.orig")
     reverted = patch.commit_reverted[:7] if patch.commit_reverted else "change"
-    sha = git.commit_all(
-        f"fix: revert {reverted} ({incident_type}) [DataSentinel {patch.incident_id}]",
-        *BOT_AUTHOR,
-    )
+    try:
+        write_text_atomic(target, proposed)
+        git.stage_file(patch.file)
+        sha = git.commit_staged(
+            f"fix: revert {reverted} ({incident_type}) [DataSentinel {patch.incident_id}]",
+            *BOT_AUTHOR,
+        )
+    except Exception:
+        write_text_atomic(target, current)
+        git.stage_file(patch.file)
+        raise
     log.info("Applied patch %s to %s as commit %s", patch.patch_id, patch.file, sha[:7])
     return patch.model_copy(update={"status": "APPLIED", "applied_at": utcnow(), "applied_commit": sha})

@@ -37,7 +37,7 @@ def create_app() -> FastAPI:
     @app.exception_handler(Exception)
     async def handle_unexpected(_: Request, exc: Exception) -> JSONResponse:
         log.exception("Unhandled error")
-        return JSONResponse(status_code=500, content={"detail": f"Internal error: {type(exc).__name__}: {exc}"})
+        return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 
     app.include_router(health_router)
     app.include_router(router)

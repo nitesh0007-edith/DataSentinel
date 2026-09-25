@@ -159,6 +159,14 @@ cd backend
 pytest
 ```
 
+The frontend release build can be checked with `cd frontend && npm run build`.
+
+## Recommended for IBM Bob
+
+- Add cross-process locking for the JSON state and workspace mutations if the demo is served with multiple API workers. The current in-process lock protects one service instance.
+- Design an operator-controlled rollback after a committed fix fails validation. Commit-time failures already restore the source, but reverting a committed fix is a separate incident decision.
+- Expand adversarial evidence tests and review how LLM inference text is presented to operators. Deterministic data findings remain authoritative.
+
 The suite covers data generation, profiling, every detection rule, the filter incident, git and path safety, heuristic RCA, LLM grounding and fallback (with a fake provider, no API keys), the patch safety checks, validation failing without a fix, the API golden path, and end-to-end resolution of all five incident types.
 
 ## Safety design

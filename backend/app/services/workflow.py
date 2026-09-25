@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from app.core.config import Settings
-from app.core.errors import ConflictError, NotFoundError
+from app.core.errors import ConflictError, NotFoundError, UnsafeOperationError
 from app.core.logging import get_logger
 from app.core.models import (
     DataHealth,
@@ -101,8 +101,13 @@ class DataSentinelService:
     def reset_demo(self, rows: int | None = None, seed: int | None = None) -> DemoState:
         with self._lock:
             s = self.settings
-            for d in (s.data_dir / "current", s.data_dir / "baseline", s.data_dir / "generated",
-                      s.profiles_dir, s.incidents_dir, s.patches_dir, s.logs_dir):
+            managed_dirs = (s.data_dir / "current", s.data_dir / "baseline", s.data_dir / "generated",
+                            s.profiles_dir, s.incidents_dir, s.patches_dir, s.logs_dir)
+            home = s.home.resolve()
+            for d in managed_dirs:
+                if d.is_symlink() or d.resolve() != home / d.relative_to(s.home):
+                    raise UnsafeOperationError(f"Refusing to reset symlinked data directory: {d}")
+            for d in managed_dirs:
                 if d.exists():
                     for child in d.iterdir():
                         if child.name == ".gitkeep":

@@ -110,6 +110,22 @@ class GitRepository:
         self._run(["commit", "-q", "-m", message], env=env)
         return self.head()
 
+    def stage_file(self, path: str) -> None:
+        self._run(["add", "--", validate_repo_path(path)])
+
+    def commit_staged(self, message: str, author_name: str, author_email: str) -> str:
+        import os
+
+        env = {
+            **os.environ,
+            "GIT_AUTHOR_NAME": author_name,
+            "GIT_AUTHOR_EMAIL": author_email,
+            "GIT_COMMITTER_NAME": author_name,
+            "GIT_COMMITTER_EMAIL": author_email,
+        }
+        self._run(["commit", "-q", "-m", message], env=env)
+        return self.head()
+
     # ------------------------------------------------------------ reads
     def head(self, short: bool = False) -> str:
         args = ["rev-parse", "--short", "HEAD"] if short else ["rev-parse", "HEAD"]

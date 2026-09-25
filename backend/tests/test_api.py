@@ -40,3 +40,18 @@ def test_workflow_errors_are_clean(settings):
     assert "detail" in r.json()
     assert c.post("/api/incidents/inject", json={"type": "not_a_type"}).status_code == 422
     assert c.get("/api/incidents/INC-9999").status_code == 404
+
+
+def test_unexpected_errors_do_not_expose_exception_details(settings):
+    from app.api.deps import get_service
+    from app.main import create_app
+
+    app = create_app()
+
+    def fail():
+        raise RuntimeError("secret diagnostic detail")
+
+    app.dependency_overrides[get_service] = fail
+    response = TestClient(app, raise_server_exceptions=False).get("/health")
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Internal server error"}

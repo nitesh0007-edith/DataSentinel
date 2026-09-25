@@ -58,6 +58,13 @@ def validate_incident(
     checks: list[ValidationCheck] = []
 
     checks.append(ValidationCheck(
+        name="Approved patch applied",
+        passed=incident.patch is not None and incident.patch.status == "APPLIED",
+        detail="Proposed patch was approved and committed." if incident.patch and incident.patch.status == "APPLIED"
+        else "Apply the proposed patch before the incident can be resolved.",
+    ))
+
+    checks.append(ValidationCheck(
         name="Pipeline completed",
         passed=run.status == RunStatus.SUCCESS,
         detail=f"Run {run.run_id} finished with status {run.status.value}" + (f": {run.error}" if run.error else "."),

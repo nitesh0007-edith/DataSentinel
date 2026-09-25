@@ -2,6 +2,7 @@ import pytest
 
 from app.core.errors import ConflictError, UnsafeOperationError
 from app.core.models import IncidentStatus, IncidentType
+from app.investigation.git_analyzer import GitError
 from app.pipeline.workspace import resolve_in_repo
 
 
@@ -28,6 +29,16 @@ def test_validation_without_fix_fails(filter_incident):
     assert {"Row count restored", "Germany restored", "Italy restored", "Repository tests"} <= failed
 
 
+def test_healthy_output_without_approved_patch_cannot_resolve(filter_incident):
+    svc, inc = _to_fix(filter_incident)
+    target = svc.settings.pipeline_repo / inc.patch.file
+    target.write_text((svc.settings.patches_dir / f"{inc.patch.patch_id}.proposed").read_text())
+    inc = svc.validate(inc.id)
+    assert inc.status == IncidentStatus.VALIDATION_FAILED
+    assert inc.validation.detection.data_health.value == "HEALTHY"
+    assert next(c for c in inc.validation.checks if c.name == "Approved patch applied").passed is False
+
+
 def test_full_golden_path_resolves(filter_incident):
     svc, inc = _to_fix(filter_incident)
     inc = svc.apply_fix(inc.id)
@@ -48,6 +59,45 @@ def test_apply_refuses_if_file_changed(filter_incident):
     target.write_text(target.read_text() + "\n# local edit\n")
     with pytest.raises(ConflictError):
         svc.apply_fix(inc.id)
+
+
+def test_apply_refuses_unrelated_workspace_changes(filter_incident):
+    svc, inc = _to_fix(filter_incident)
+    target = svc.settings.pipeline_repo / inc.patch.file
+    before = target.read_text()
+    (svc.settings.pipeline_repo / "unrelated.txt").write_text("keep me")
+    with pytest.raises(ConflictError, match="uncommitted changes"):
+        svc.apply_fix(inc.id)
+    assert target.read_text() == before
+
+
+def test_apply_restores_source_if_commit_fails(filter_incident, monkeypatch):
+    svc, inc = _to_fix(filter_incident)
+    target = svc.settings.pipeline_repo / inc.patch.file
+    before = target.read_text()
+
+    def fail_commit(*args):
+        raise GitError("simulated commit failure")
+
+    monkeypatch.setattr("app.investigation.git_analyzer.GitRepository.commit_staged", fail_commit)
+    with pytest.raises(GitError, match="simulated"):
+        svc.apply_fix(inc.id)
+    assert target.read_text() == before
+    assert svc.store.load().incidents[inc.id].patch.status == "PROPOSED"
+
+
+def test_reset_refuses_symlinked_data_directory(service, tmp_path):
+    managed = service.settings.data_dir / "current"
+    managed.rmdir()
+    unrelated = tmp_path / "unrelated"
+    unrelated.mkdir()
+    marker = unrelated / "keep.txt"
+    marker.write_text("keep")
+    managed.symlink_to(unrelated, target_is_directory=True)
+
+    with pytest.raises(UnsafeOperationError, match="symlinked"):
+        service.reset_demo()
+    assert marker.read_text() == "keep"
 
 
 def test_rejected_patch_cannot_be_applied(filter_incident):

@@ -206,9 +206,12 @@ def _extract_json(text: str) -> dict:
     if start < 0 or end <= start:
         raise LLMError("Model response contained no JSON object")
     try:
-        return json.loads(text[start : end + 1])
+        result = json.loads(text[start : end + 1])
     except json.JSONDecodeError as exc:
         raise LLMError(f"Model returned invalid JSON: {exc}") from exc
+    if not isinstance(result, dict):
+        raise LLMError("Model response must be a JSON object")
+    return result
 
 
 def _valid_lines(evidence: EvidencePackage, file: str) -> set[int]:
@@ -227,7 +230,7 @@ def ground_llm_result(raw: dict, evidence: EvidencePackage, fallback: RootCauseA
     """Reject any repository facts that are not present in the evidence."""
     notes: list[str] = []
     known_files = set(evidence.changed_files) | {s.file for s in evidence.source_snippets}
-    known_commits = [ce.commit.sha for ce in evidence.commits_since_baseline] + [c.sha for c in evidence.recent_commits]
+    known_commits = [ce.commit.sha for ce in evidence.commits_since_baseline]
 
     file = raw.get("file")
     if file and file not in known_files:
@@ -249,16 +252,13 @@ def ground_llm_result(raw: dict, evidence: EvidencePackage, fallback: RootCauseA
         if match is None:
             notes.append(f"LLM cited commit '{commit}' which is not in the evidence; replaced with deterministic finding.")
         commit = match or fallback.commit
+    if file and commit and not any(
+        ce.commit.sha == commit and any(h.file == file for h in ce.hunks)
+        for ce in evidence.commits_since_baseline
+    ):
+        notes.append("LLM cited a file and commit that do not belong to the same change; replaced with deterministic finding.")
+        file, line, commit = fallback.file, fallback.line, fallback.commit
     commit_info = _commit_for(evidence, commit) if commit else None
-
-    try:
-        itype = IncidentType(raw.get("incident_type", "unknown"))
-    except ValueError:
-        itype = fallback.incident_type
-    try:
-        severity = Severity(raw.get("severity", fallback.severity.value))
-    except ValueError:
-        severity = fallback.severity
 
     try:
         confidence = max(0.0, min(1.0, float(raw.get("confidence", 0.0))))
@@ -266,19 +266,20 @@ def ground_llm_result(raw: dict, evidence: EvidencePackage, fallback: RootCauseA
         confidence = 0.0
 
     return RootCauseAnalysis(
-        incident_type=itype,
-        severity=severity,
-        likely_root_cause=str(raw.get("likely_root_cause") or fallback.likely_root_cause),
+        incident_type=fallback.incident_type,
+        severity=fallback.severity,
+        likely_root_cause=fallback.likely_root_cause,
         file=file,
         line=line,
         commit=commit,
         commit_message=commit_info.message if commit_info else None,
         confidence=round(confidence, 2),
-        impact=str(raw.get("impact") or fallback.impact),
-        recommended_fix=str(raw.get("recommended_fix") or fallback.recommended_fix),
-        observed_facts=[str(x) for x in raw.get("observed_facts", [])] or fallback.observed_facts,
-        inferences=[str(x) for x in raw.get("inferences", [])] or fallback.inferences,
-        insufficient_evidence=bool(raw.get("insufficient_evidence", False)),
+        impact=fallback.impact,
+        recommended_fix=fallback.recommended_fix,
+        observed_facts=fallback.observed_facts,
+        inferences=[str(x) for x in raw.get("inferences", []) if isinstance(x, str)]
+        if isinstance(raw.get("inferences"), list) else fallback.inferences,
+        insufficient_evidence=fallback.insufficient_evidence,
         engine=f"llm:{label}",
         engine_notes=notes,
     )
