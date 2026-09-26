@@ -1,0 +1,26 @@
+# One instance and one worker: JSON/filesystem state has process-local locking.
+services:
+  - type: web
+    name: datasentinel-api
+    runtime: docker
+    plan: 1c-2g
+    numInstances: 1
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: DATASENTINEL_HOME
+        value: /var/lib/datasentinel
+      - key: DATASENTINEL_WORKSPACE_DIR
+        value: /var/lib/datasentinel/workspace
+      - key: DATASENTINEL_CORS_ORIGINS
+        sync: false
+      - key: LLM_PROVIDER
+        value: heuristic
+      - key: WEB_CONCURRENCY
+        value: "1"
+    disk:
+      name: datasentinel-runtime
+      mountPath: /var/lib/datasentinel
+      sizeGB: 1
