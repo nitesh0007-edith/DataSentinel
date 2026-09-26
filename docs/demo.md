@@ -4,20 +4,9 @@ Time needed: about 4 minutes. Every value shown in the UI comes from the backend
 
 ## Before presenting
 
-```bash
-# terminal 1
-cd backend && uvicorn app.main:app --port 8000
-# terminal 2
-cd frontend && npm run dev
-```
+Open **https://datasentinel-seven.vercel.app** and confirm **API connected** and **RCA engine: heuristic**. Reserve the shared demo during presentation, then click Reset Demo. Use the [timestamped video script](demo-video-script.md) for a 4:30 recording.
 
-Open http://localhost:3000 and confirm the header shows **API connected**. A dry run without the UI:
-
-```bash
-python scripts/run_golden_path.py
-```
-
-It must end with `Incident INC-0001: RESOLVED`. Run it twice. After the dry run, click **Reset Demo** in the UI.
+For a local alternative, run `cd backend && uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1` and `cd frontend && npm run dev` in separate terminals. Open http://localhost:3000. A headless dry run is `python scripts/run_golden_path.py` from the repository root with the backend environment active. Stop any API process using the same runtime directory before that script, then restart it.
 
 The highlighted blue button is always the next step, and the "Next:" hint explains it.
 
@@ -44,11 +33,12 @@ The highlighted blue button is always the next step, and the "Next:" hint explai
 - Detection is deterministic statistics with configurable thresholds. The LLM is only used for reasoning over evidence.
 - The RCA cites a real file, line and commit, and any LLM answer is checked against the evidence.
 - Remediation is proposed, then approved, then applied, then validated. It is never silent.
-- Honesty check: click **Validate** *before* applying a fix to show the incident is **not** marked resolved (VALIDATION_FAILED).
+- Failed validation keeps the incident open. For a committed-fix recovery demonstration, use the clearly labeled local failure fixture in [screenshot-checklist.md](screenshot-checklist.md). Click **Roll Back Fix** only after failed validation with an applied patch, then generate a new fix, apply and validate. Rollback restores the pre-fix regressed source and preserves evidence; it does not itself establish recovery.
+- [Timestamped video script](demo-video-script.md) and [micro demo](micro-demo.md) provide the submission storyboards.
 
 ## Encore: other incident types
 
-Once INC-0001 is resolved, pick another type from the dropdown and repeat steps 3–11:
+Once INC-0001 is resolved, pick another type and repeat steps 3–11, or reset and capture a new baseline first:
 
 - **Schema drift**: the `revenue` column goes missing.
 - **Null explosion**: `sales_rep` nulls jump to about 25%.
@@ -57,6 +47,6 @@ Once INC-0001 is resolved, pick another type from the dropdown and repeat steps 
 
 ## If something goes wrong
 
-- **API offline**: start the backend. The error banner shows the command.
+- **API offline**: verify connectivity; for the hosted demo consult deployment health checks, and locally start the backend.
 - **Any 409 error**: the message explains the workflow state. **Reset Demo** always recovers.
 - **LLM provider down**: RCA falls back to the deterministic engine automatically, and the root-cause card shows the engine note.

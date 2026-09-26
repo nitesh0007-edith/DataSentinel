@@ -1,181 +1,165 @@
 # DataSentinel
 
-**An autonomous data reliability engineer.**
+**Your pipeline can succeed while your data fails.**
 
-> Pipeline status: **SUCCESS** ✅  ·  Data health: **CRITICAL** 🔴
+[Open the live demo](https://datasentinel-seven.vercel.app)
 
-## The problem
+An Autonomous Data Reliability Engineer that connects data, run and code evidence to investigate silent failures and validate an approved repair.
 
-Orchestrators like Airflow, Dagster and dbt Cloud tell you whether your code *ran*, not whether your data is *right*. A pipeline can finish green while it silently produces wrong data. Common causes:
+> **Pipeline Status: SUCCESS**<br>
+> **Data Health: CRITICAL**
 
-- a filter that was narrowed by accident (whole markets vanish)
-- schema drift (a renamed column breaks every consumer)
-- null explosions, duplicate ingestion, unit bugs that shift distributions
-- "harmless" refactors of transformation code
+## The Problem
 
-Nobody gets paged, and the dashboards are wrong until a human notices.
+Orchestrators tell us whether jobs ran, not whether the output is correct. Narrowed filters, schema drift, null explosions, duplicate ingestion, distribution shifts and broken transformations can all leave a green pipeline producing bad data.
 
-## The solution
+## The Solution
 
-DataSentinel watches pipeline outputs and closes the loop:
+**DETECT → INVESTIGATE → ROOT CAUSE → PROPOSE → APPLY → VALIDATE → REPORT**
 
-```
-DETECT  →  INVESTIGATE  →  ROOT CAUSE  →  PROPOSE FIX  →  APPLY (approved)  →  VALIDATE  →  REPORT
-```
+DataSentinel compares output with a healthy baseline, correlates anomalies with real Git changes and proposes a repair. An operator approves the patch. Reruns, profile comparisons and repository tests must pass before the incident is resolved. Failed committed remediation supports operator-controlled rollback and retry.
 
-1. **Profiles** every run: row counts, nulls, duplicates, dtypes, numeric statistics and category frequencies.
-2. **Detects** anomalies against a healthy baseline using deterministic, explainable rules. The math is never done by an LLM.
-3. **Investigates.** It collects git history since the last healthy run and correlates diff hunks with the anomalies.
-4. **Explains** the root cause, citing file, line and commit, with a confidence score. Observed facts are kept separate from inferences. An optional LLM reasons over the same evidence package, and its output is grounded: any file, line or commit that isn't in the evidence is rejected.
-5. **Proposes** a patch (a reverse of the offending hunk). The patch is shown as a diff and only applied when someone clicks Apply.
-6. **Validates** by rerunning the pipeline, re-profiling, comparing to the baseline and running the repository's tests. The incident becomes **RESOLVED** only if every check passes.
-7. **Reports** the incident as a Markdown write-up under `artifacts/incidents/`.
+This MVP uses reproducible synthetic customer data. The public demo uses heuristic RCA and needs no external AI key.
+
+## Live Demo
+
+**[Launch DataSentinel](https://datasentinel-seven.vercel.app)**
+
+Click **Reset Demo → Run Healthy Pipeline**, select **Filter regression**, then **Inject Incident → Run Pipeline → Detect → Investigate → Generate Fix → Apply Fix → Validate**.
+
+[Click-by-click guide](docs/demo.md) · [4:30 video script](docs/demo-video-script.md) · [30-second storyboard](docs/micro-demo.md)
+
+## Demo Scenario
+
+| Healthy output | Regressed output | Row change | Missing markets |
+|---|---|---|---|
+| 110,000 rows | 43,760 rows | −60.2% | Germany and Italy |
+
+A real commit narrows `country.isin(["UK", "Germany", "Italy"])` to `country == "UK"`. Execution still reports SUCCESS. Detection marks data CRITICAL, and RCA identifies `pipelines/customer_transform.py:46` and the offending commit. The approved reverse patch restores all three countries and validates to RESOLVED.
 
 ## Screenshots
 
-_Placeholder: add `docs/screenshots/critical.png` (SUCCESS vs CRITICAL) and `docs/screenshots/resolved.png` after running the demo._
+Captured from the live application at a consistent 1440 × 1000 viewport. [Capture provenance](docs/screenshots/capture.json) · [Repeatable capture instructions](docs/screenshot-checklist.md).
+
+**Silent failure**
+
+![Successful pipeline with critical data health](docs/screenshots/critical.png)
+
+**Evidence-grounded root cause**
+
+![Source file, line and root-cause explanation](docs/screenshots/root-cause.png)
+
+**Proposed repair, awaiting operator approval**
+
+![Proposed reverse patch](docs/screenshots/proposed-fix.png)
+
+**Validated recovery**
+
+![Resolved incident with healthy data](docs/screenshots/resolved.png)
+
+[Healthy baseline](docs/screenshots/healthy.png) · [Real Git diff](docs/screenshots/git-evidence.png) · [Passed validation checks](docs/screenshots/validation-passed.png)
+
+The correct hosted repair passes validation. Live failed-validation and rollback captures are therefore not claimed; the [capture guide](docs/screenshot-checklist.md) describes the recovery capture limitation.
 
 ## Architecture
 
-```
-          Next.js dashboard (frontend/)
-                    │  REST
-                    ▼
-          FastAPI (backend/app/api)
-                    │
-          DataSentinelService (services/workflow.py) ── JSON state (artifacts/state.json)
-   ┌──────────┬──────────┼───────────┬─────────────┬────────────┐
-pipeline   profiling  detection  investigation  remediation  validation → reporting
-generator  profiler   rules      git_analyzer   patch_gen    validator    incident_report
-runner                engine     evidence       patch_svc
-injector                         rca_agent ── llm/ (heuristic | anthropic | openai)
-   │
-   ▼
-workspace/pipeline_repo   ← a real git repo holding the monitored transformation code
-```
+![DataSentinel architecture](docs/architecture.svg)
 
-**Why a separate `workspace/pipeline_repo`?** DataSentinel needs real git evidence (`git log`, `git show`, diffs), and injected regressions and fixes need to be real commits. Committing broken code into DataSentinel's own history on every demo would pollute your branches. So the monitored pipeline lives in a small git repo that is rebuilt from `backend/app/pipeline/template_repo/` on every reset. That keeps the demo deterministic and your repo clean.
+The dashboard calls FastAPI over REST. A single workflow coordinates simulation, profiling, detection, investigation, remediation, validation and reporting. JSON state, artifacts and the generated monitored repository persist on disk.
 
-More detail is in [docs/architecture.md](docs/architecture.md).
+[Architecture details](docs/architecture.md) · [Mermaid source](docs/architecture.mmd)
 
-## Setup
+## How It Works
 
-Prerequisites: Python 3.11+, Node 20+, and `git` on PATH.
+**DATA STATE + RUN STATE + CODE STATE → evidence-grounded RCA**
 
-### Backend
+Profiles establish what changed. Run history establishes when it changed and whether execution succeeded. Git history supplies the transformation changes to investigate. Deterministic rules calculate metrics and severity; heuristic RCA correlates those observations with code evidence. Optional model explanations are constrained to the evidence package and grounded before use.
 
-```bash
-cd backend
-python -m venv .venv && source .venv/bin/activate   # optional
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
+## Why Real Git Evidence Matters
 
-API docs are served at http://localhost:8000/docs.
+`workspace/pipeline_repo` is a separate, generated **real Git repository**. Injected regressions, approved fixes and rollbacks create actual commits. RCA cites its history and diffs while DataSentinel’s own application history stays clean. Reset recreates the monitored repository from its checked-in template; never edit the generated workspace manually.
 
-### Frontend
+## Safety Design
 
-```bash
-cd frontend
-npm install
-cp .env.local.example .env.local     # NEXT_PUBLIC_API_URL=http://localhost:8000
-npm run dev                          # http://localhost:3000
-```
+- Deterministic detection and heuristic-first RCA; optional LLM output grounded to evidence.
+- Patch preview and explicit **Apply Fix** approval before modification.
+- Python-only patch targets confined to the monitored repository, with hash checks and backups.
+- Validation must pass before RESOLVED; a failed committed fix remains open.
+- Operator-controlled rollback restores pre-fix source, commits the restoration and permits retry. Rollback itself does not prove healthy data.
+- Exactly one backend process and instance: JSON/filesystem state uses process-local locking.
+- Provider secrets belong only in backend environment settings.
 
-> **Tip:** if the project lives in a synced folder (Google Drive, Dropbox, iCloud), `node_modules/` and the demo's git workspace will sync thousands of small files. Clone it to a normal local directory, or set `DATASENTINEL_WORKSPACE_DIR` to a local path.
+The public app is a shared, resettable synthetic-data demo. Production authentication and tenant isolation are roadmap work.
 
-### Environment variables
+## Incident Types
 
-Copy `.env.example` to `.env` in the repo root. Everything is optional:
-
-| Variable | Default | Purpose |
+| Type | Regression | Detected signal |
 |---|---|---|
-| `LLM_PROVIDER` | `heuristic` | `heuristic` (deterministic, offline), `anthropic`, or `openai` |
-| `LLM_MODEL` | provider default | Model override |
-| `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` | | Keys for the chosen provider |
-| `DATASENTINEL_HOME` | repo root | Root for `data/`, `artifacts/`, `workspace/` |
-| `DATASENTINEL_WORKSPACE_DIR` | `$HOME/workspace` | Location of the monitored pipeline repo |
-| `DATASENTINEL_DEFAULT_ROWS` / `_SEED` | `110000` / `42` | Synthetic data size and seed |
-| `DATASENTINEL_THRESHOLDS` | see `core/config.py` | JSON override of detection thresholds |
+| Filter regression | Three-country filter becomes UK only | Row loss, missing countries, distribution shift |
+| Null explosion | Enterprise sales representatives masked | Null-rate drift |
+| Duplicate ingestion | Replay batch appended again | Duplicates and row growth |
+| Schema drift | Revenue column renamed | Missing/unexpected columns |
+| Revenue distribution shift | Revenue divided by 100 | Numeric distribution shift |
 
-If an LLM provider is configured but unreachable or returns invalid output, DataSentinel falls back to the deterministic engine and records why in `engine_notes`.
+## IBM Bob Contribution
 
-## Running the demo
+IBM Bob improved an existing working repository; it did **not** build the entire product. Bob initialized and understood the repository, independently assessed reliability and identified a missing recovery path after committed remediation failed validation.
 
-Use the UI; exact steps are in [docs/demo.md](docs/demo.md). You can also run it headless:
+Bob implemented operator-controlled rollback and its frontend flow, hardened RCA trust boundaries, improved state/report persistence ordering and duplicate-apply idempotency, added single-worker deployment warnings, and expanded regression/adversarial tests. It then independently reviewed the implementation. The supplied Bob critic assessment reported **no HIGH/CRITICAL blockers** and **RELEASE READY: YES**.
 
-```bash
-python scripts/run_golden_path.py                       # filter_regression, end to end
-python scripts/run_golden_path.py --type schema_drift   # any incident type
-```
+[Repository assessment](improvements-plan.md); implementation commit `8176e22`.
 
-Individual steps:
+## Development Workflow
 
-```bash
-python scripts/reset_demo.py --baseline      # reset + healthy baseline
-python scripts/inject_incident.py filter_regression
-python scripts/run_pipeline.py --detect      # prints Pipeline Status = SUCCESS, Data Health = CRITICAL
-```
-
-## Incident types
-
-| Type | Injected code change | Detected by |
-|---|---|---|
-| `filter_regression` (P0) | `country.isin(["UK","Germany","Italy"])` → `country == "UK"` | row count −60%, Germany/Italy disappear, category shift |
-| `null_explosion` | `sales_rep` masked for Enterprise accounts | null-rate drift on `sales_rep` |
-| `duplicate_ingestion` | replay batch re-appended in bronze | duplicate-rate drift, row count +15% |
-| `schema_drift` | `revenue` renamed to `revenue_amount` | missing and unexpected columns |
-| `revenue_shift` | revenue divided by 100 | numeric mean/median drift |
-
-In every case the pipeline still reports **SUCCESS**.
-
-## API overview
-
-| Method | Path | Description |
-|---|---|---|
-| GET | `/health` | Liveness and configured RCA engine |
-| GET | `/api/state` | Everything the dashboard needs |
-| POST | `/api/demo/reset` | Reset data, artifacts and pipeline repo; regenerate data |
-| POST | `/api/data/generate` | `{rows, seed}`: regenerate raw data |
-| POST | `/api/pipeline/run` | `{set_baseline}`: run RAW→BRONZE→SILVER→GOLD |
-| GET | `/api/pipeline/runs` | Run history |
-| GET | `/api/incidents/types` | Injectable incident scenarios |
-| POST | `/api/incidents/inject` | `{type}`: commit a regression to the pipeline repo |
-| POST | `/api/incidents/detect` | Compare the latest run with the baseline; opens an incident on WARNING/CRITICAL |
-| GET | `/api/incidents[/{id}]` | Incidents |
-| POST | `/api/incidents/{id}/investigate` | Evidence package and RCA |
-| POST | `/api/incidents/{id}/fix` | Propose a patch (no file changes) |
-| POST | `/api/incidents/{id}/reject` | Reject the proposed patch |
-| POST | `/api/incidents/{id}/apply` | Apply the approved patch (hash-checked, repo-confined, committed) |
-| POST | `/api/incidents/{id}/validate` | Rerun, re-profile, compare and test; RESOLVED only on full pass |
-| GET | `/api/incidents/{id}/report` | Markdown incident report |
-
-Errors return `{"detail": "..."}` with 400/403/404/409 status codes.
+| Tool | Contribution |
+|---|---|
+| Claude Code | Initial working MVP |
+| Codex | Testing, QA, hardening, deployment preparation and release content |
+| IBM Bob | Repository-level reliability engineering and independent critic review |
 
 ## Testing
 
-```bash
-cd backend
-pytest
+Verified engineering release: **62/62 backend tests passed**, **TypeScript clean**, **production frontend build passed**. The hosted golden path and restart persistence were verified. [Validation record](docs/release-validation.md).
+
+```sh
+(cd backend && python -m pytest -v)
+python scripts/run_golden_path.py
+(cd frontend && npm run lint && npm run build)
 ```
 
-The frontend release build can be checked with `cd frontend && npm run build`.
+Tests use temporary directories and fake providers. `npm run lint` runs TypeScript checking (`tsc --noEmit`).
 
-## Recommended for IBM Bob
+## Deployment
 
-- Add cross-process locking for the JSON state and workspace mutations if the demo is served with multiple API workers. The current in-process lock protects one service instance.
-- Design an operator-controlled rollback after a committed fix fails validation. Commit-time failures already restore the source, but reverting a committed fix is a separate incident decision.
-- Expand adversarial evidence tests and review how LLM inference text is presented to operators. Deterministic data findings remain authoritative.
+Public frontend: **https://datasentinel-seven.vercel.app**. [Technical deployment settings and checks](docs/deployment.md).
 
-The suite covers data generation, profiling, every detection rule, the filter incident, git and path safety, heuristic RCA, LLM grounding and fallback (with a fake provider, no API keys), the patch safety checks, validation failing without a fix, the API golden path, and end-to-end resolution of all five incident types.
+## Local Setup
 
-## Safety design
+Prerequisites: Python 3.11+, Node 20.9+ and Git on PATH.
 
-- **Git:** allowlisted subcommands only, argument lists (never a shell), timeouts, validated revisions and paths, and host git hooks disabled.
-- **Patches:** only proposed patches can be applied, and only after explicit approval. Targets must resolve inside the pipeline repo (not `.git`) and be `.py` files. The file hash must match what the patch was generated against, and the stored proposed content is hash-verified. Every applied patch is committed, and the original is backed up in `artifacts/patches/`.
-- **LLM:** receives only the evidence package, never raw repository access. Its answer is grounded against that evidence, and deterministic logic remains the source of truth for the numbers.
-- **Secrets:** read only from the environment. `.env` is gitignored.
+```sh
+# Backend, terminal 1
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+LLM_PROVIDER=heuristic uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1
+```
 
-## Hackathon context
+```sh
+# Frontend, terminal 2
+cd frontend
+npm ci
+cp .env.local.example .env.local
+npm run dev
+```
 
-Built as a working vertical slice. The priority was one flawless end-to-end story (filter regression → SUCCESS but wrong → CRITICAL → root cause → fix → validation → RESOLVED), then breadth across the remaining incident types. State is kept in JSON files and there is no database or other infrastructure. See `DATASENTINEL_BUILD_PLAN_v2.md` for the full plan and the Codex and Bob hardening phases.
+Open http://localhost:3000, then Reset Demo and Run Healthy Pipeline. Run root demo scripts from the repository root, with the backend environment activated. Stop an API process before running scripts against the same runtime directory.
+
+Root `.env.example` documents backend settings. `DATASENTINEL_HOME` defaults to the repository root and `DATASENTINEL_WORKSPACE_DIR` to `<home>/workspace`. CORS uses `DATASENTINEL_CORS_ORIGINS` as a JSON array. Heuristic RCA is the default; optional provider keys belong in an ignored `.env` or backend environment settings, never frontend variables.
+
+## Future Roadmap
+
+Databricks, Airflow, dbt, Snowflake and Azure Data Factory integrations; GitHub correlation, Slack notifications and historical incident memory. Enterprise work includes authentication, isolation and storage/locking suitable for multiple processes. No delivery timelines are claimed.
+
+[Submission copy](docs/submission.md) · [Seven-slide deck content](docs/pitch-deck.md)

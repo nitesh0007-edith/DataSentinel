@@ -1,0 +1,22 @@
+{
+  "captured_at": "2026-09-26T14:12:19.510Z",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "source": "http://localhost:3010",
+  "provider": "heuristic",
+  "rollback_fixture": true,
+  "fixture_note": "One deliberately failed repository-test check; real workflow, Git commits, rollback and retry.",
+  "captures": [
+    {
+      "file": "validation-failed.png",
+      "focus": "Validation"
+    },
+    {
+      "file": "rollback.png",
+      "focus": "Suggested remediation"
+    }
+  ],
+  "archive_note": "Only the two local recovery images are retained here. original-capture.json records the earlier full session."
+}

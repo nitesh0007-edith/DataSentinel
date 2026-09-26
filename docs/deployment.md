@@ -1,6 +1,6 @@
 # Deployment: Vercel + Render
 
-Preparation only: no service has been created or deployed. The instructions below are manual steps to perform when deployment is authorized.
+The application is live. Public frontend: **https://datasentinel-seven.vercel.app**. Technical API base: `https://datasentinel-api-gw7s.onrender.com`. Hosted health, CORS, golden-path resolution and restart persistence were verified. The settings below document the deployed architecture; this content update does not deploy anything.
 
 ```mermaid
 flowchart TB
@@ -15,23 +15,14 @@ Railway is also compatible: its persistent volumes cannot be used with replicas.
 
 ## Render backend
 
-1. The checkout is currently on `main`, and `release-submission` already exists. Use `git switch release-submission`, rather than creating that branch again. Your uncommitted files are carried between these branches because they currently share the same engineering commit. Review and commit/push only deployment files: `render.yaml`, `backend/Dockerfile`, `.dockerignore`, `.env.example`, `frontend/vercel.json`, `frontend/.env.local.example` and `docs/deployment.md`. Earlier screenshot/README/submission edits are unrelated to this deployment-only pass. A push before committing these files does not publish them. These instructions do not commit or push for you.
-2. In Render, select **New → Blueprint**, connect the repository, choose `release-submission` (or the branch containing these files), and use root `render.yaml`.
-3. Review the paid `1c-2g` service and 1 GB disk before creating them. This size gives the pandas demo headroom; memory usage on the host still needs checking. Free services cannot use this persistent disk.
-4. At the environment prompt, set `DATASENTINEL_CORS_ORIGINS` to a JSON array containing your exact Vercel production origin, for example `["https://YOUR-PROJECT.vercel.app"]`. This is public configuration, not a secret. If the Vercel URL is not yet known, use `[]`, deploy the backend, then update it after creating the frontend.
-5. Deploy. Record the assigned HTTPS backend URL. Verify `/health` below.
+The deployed configuration is published on `main`. Render uses the repository-root `render.yaml`, Docker runtime, **Frankfurt**, one `1c-2g` instance and a 1 GB persistent disk. Region is selected when the service is created. Automatic deployment remains off.
 
-To publish only the prepared deployment files when you are ready, run from the repository root after reviewing the diff:
+For a fresh installation:
 
-```sh
-git switch release-submission
-git add render.yaml backend/Dockerfile .dockerignore .env.example frontend/vercel.json frontend/.env.local.example docs/deployment.md
-git diff --cached
-git commit -m "chore: prepare Render and Vercel deployment"
-git push -u origin release-submission
-```
-
-Check the staged diff before committing: staging these explicit paths does not remove any files already staged by another command. The other release assets remain outside this deployment-only commit.
+1. Connect the GitHub repository through **New → Blueprint**, select `main`, and use root `render.yaml`.
+2. Review the paid service and disk settings before creating them.
+3. Set `DATASENTINEL_CORS_ORIGINS=["https://datasentinel-seven.vercel.app"]` for this frontend, or the exact origin of your own deployment.
+4. Deploy manually and verify `/health`, then initialize from the frontend.
 
 The Blueprint uses repository-root Docker context and `backend/Dockerfile`. Do not set a backend root directory: the image also copies selected root demo scripts. Screenshot/failure-fixture tooling is excluded. Render builds the Dockerfile automatically; leave its dashboard Build Command and Docker Command overrides unset. Equivalent exact backend build command, from the repository root:
 
@@ -53,8 +44,8 @@ exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8000}" --workers 1
 
 1. Import the same GitHub repository into Vercel.
 2. Framework preset: **Next.js**. Root Directory: **frontend**. Install Command: `npm ci`. Build Command: `npm run build` (already expands to `next build --webpack`). Leave Output Directory at the framework default. `frontend/vercel.json` records the framework and commands; Root Directory is a dashboard setting.
-3. Select Node **24.x** in Vercel Project Settings, a supported LTS version meeting Next.js's >=20.9 requirement. Set the production branch to the branch containing the reviewed deployment files (`release-submission` for this staging sequence, or `main` after merging). GitHub's default branch being `main` does not automatically publish your uncommitted configuration. See [Vercel Node versions](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions).
-4. Add `NEXT_PUBLIC_API_URL=https://YOUR-BACKEND.onrender.com` under **Settings → Environment Variables**, for **Production**. It is the API base URL, without `/api` and preferably without a trailing slash. It must use HTTPS.
+3. Select Node **24.x** in Vercel Project Settings, a supported LTS version meeting Next.js's >=20.9 requirement. Set the production branch to `main`. Release-content changes stay on `release-content` until reviewed and merged. See [Vercel Node versions](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions).
+4. Add `NEXT_PUBLIC_API_URL=https://datasentinel-api-gw7s.onrender.com` under **Settings → Environment Variables**, for **Production**. It is the API base URL, without `/api` and preferably without a trailing slash. It must use HTTPS.
 5. Deploy, record the stable production frontend origin, then update Render's `DATASENTINEL_CORS_ORIGINS` and redeploy the backend.
 6. If you also want Vercel previews, configure their API URL and individually allow the exact preview origins. A preview hostname is not automatically allowed by the production origin.
 7. Redeploy Vercel after changing `NEXT_PUBLIC_API_URL`: it is embedded at build time. Record the verified frontend/backend URLs for the subsequent release stage.
@@ -96,11 +87,11 @@ For local provider experiments these keys belong in your local shell or ignored 
 
 ## Health, reset and CORS verification
 
-Set these public URLs in your shell, replacing the examples:
+Use these deployed URLs for technical checks:
 
 ```sh
-BACKEND_URL=https://YOUR-BACKEND.onrender.com
-FRONTEND_ORIGIN=https://YOUR-PROJECT.vercel.app
+BACKEND_URL=https://datasentinel-api-gw7s.onrender.com
+FRONTEND_ORIGIN=https://datasentinel-seven.vercel.app
 curl -fsS "$BACKEND_URL/health"
 curl -i -X OPTIONS "$BACKEND_URL/api/demo/reset" \
   -H "Origin: $FRONTEND_ORIGIN" \
@@ -125,11 +116,19 @@ docker run --rm -p 8000:8000 -e PORT=8000 \
   -v datasentinel-runtime:/var/lib/datasentinel datasentinel-api
 ```
 
-Use a dedicated test volume. Reset replaces its demo state. A Docker daemon is needed; this image must also be built and smoke-tested on Render before claiming hosted readiness.
+Use a dedicated test volume. Reset replaces its demo state. A Docker daemon is needed for this optional local check. Render has built and run the deployed image successfully.
 
-Preparation checks can verify settings, writable temporary runtime paths, health and CORS locally. They do not establish Linux container readiness. At preparation time, the local Docker daemon is unavailable; the image build and runtime smoke test remain unverified. A paid Render service/disk, hosting account access, the published configuration branch and actual frontend/backend URLs are prerequisites for later deployment. No AI key is a blocker.
+## Hosted Verification Record
 
-Preparation verification on 26 September 2026 passed: heuristic `/health`, exact-origin CORS preflight, unlisted-origin rejection, writable isolated data/artifacts paths and two resets recreating a clean monitored Git repository. Frontend `npm run lint` and `npm run build` passed. Deployment YAML/JSON parsed and `git diff --check` passed. No hosted service was created or deployed.
+- Health returned `status=ok` and `rca_engine=heuristic`.
+- Exact-origin CORS preflight returned HTTP 200 with the deployed frontend origin.
+- Reset recreated the real monitored repository and seeded data.
+- The hosted filter-regression flow produced SUCCESS / CRITICAL at 43,760 rows and resolved after an approved repair restored 110,000 rows.
+- All nine validation checks passed, including six monitored-repository tests.
+- State fetched before and after the owner-performed Render restart was byte-identical, preserving run history, the resolved incident and repository state.
+- The normal hosted repair passes validation; failed-validation/rollback was exercised with a disclosed isolated local fixture, not forced into the live service.
+
+These checks establish this demo's observed behavior. Host memory usage has not been benchmarked. The engineering release passed 62 backend tests, frontend TypeScript checking and a production build; content-only work does not rerun that suite.
 
 ## Troubleshooting
 

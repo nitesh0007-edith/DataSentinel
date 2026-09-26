@@ -28,7 +28,7 @@
 | `investigation/prompts.py` | System prompt with evidence-only rules and JSON contract; compact evidence serialisation |
 | `llm/` | `LLMProvider` interface, Anthropic and OpenAI HTTP providers, env factory |
 | `remediation/patch_generator.py` | Reverses the suspect commit's hunks in the implicated file, producing a diff |
-| `remediation/patch_service.py` | Guarded apply and commit |
+| `remediation/patch_service.py` | Guarded apply, operator rollback and commits |
 | `validation/validator.py` | Rerun-based checks and the pipeline repo's pytest suite |
 | `reporting/incident_report.py` | Markdown report |
 | `services/workflow.py` | State machine / orchestration used by the API, scripts and tests |
@@ -36,11 +36,21 @@
 
 ## Incident lifecycle
 
+```mermaid
+flowchart LR
+  DETECTED --> ROOT_CAUSE_IDENTIFIED --> FIX_PROPOSED
+  FIX_PROPOSED --> FIX_REJECTED --> FIX_PROPOSED
+  FIX_PROPOSED -->|Human approves| FIX_APPLIED
+  FIX_APPLIED -->|All checks pass| RESOLVED
+  FIX_APPLIED -->|Validation fails| VALIDATION_FAILED
+  VALIDATION_FAILED -->|Operator rollback / restore commit| ROOT_CAUSE_IDENTIFIED
 ```
-DETECTED → ROOT_CAUSE_IDENTIFIED → FIX_PROPOSED ─┬→ FIX_APPLIED → (validate) → RESOLVED
-                                                  │                          └→ VALIDATION_FAILED → (validate again)
-                                                  └→ FIX_REJECTED → (generate fix again)
-```
+
+Validation failure keeps the incident open and the applied patch available for an explicit operator rollback. Rollback restores the pre-fix source, records a new commit, preserves failure evidence and returns the incident to `ROOT_CAUSE_IDENTIFIED`. It does not itself claim data recovery. A new proposed and approved fix must pass validation to resolve the incident.
+
+Presentation diagram: [architecture.svg](architecture.svg). Editable Mermaid source: [architecture.mmd](architecture.mmd). Hosting: [deployment.md](deployment.md).
+
+Deployment must use one worker and one service instance. The JSON store, generated Git workspace and `threading.RLock` are protected within one process only. Runtime data, state, patches and monitored Git history live on the persistent disk; the application template stays in the deployment image.
 
 ## How the root cause is found (heuristic engine)
 

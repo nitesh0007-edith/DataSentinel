@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+<title id="title">DataSentinel architecture and safe recovery</title><desc id="desc">Dashboard to FastAPI and a single-process workflow, three engine groups, human-approved remediation, validation and reporting. Real monitored Git evidence, heuristic RCA, optional grounded explanations and operator rollback remain separate.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#7d97b7"/></marker></defs>
+<rect width="1600" height="900" fill="#0a1424"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#edf4ff}.title{font-size:32px;font-weight:700}.label{font-size:22px;font-weight:700}.body{font-size:18px;fill:#b9cbe2}.small{font-size:16px;fill:#a3b7d1}.line{fill:none;stroke:#7d97b7;stroke-width:2;marker-end:url(#arrow)}</style>
+
+<text x="70" y="49" class="title" text-anchor="start">DataSentinel</text>
+<text x="70" y="77" class="body" text-anchor="start">Data + run + code evidence. Human-approved recovery.</text>
+<rect x="430" y="95" width="300" height="58" rx="14" fill="#142238" stroke="#39516e" stroke-width="1.5"/>
+<text x="580.0" y="127" class="label" text-anchor="middle">Next.js Dashboard</text>
+<path d="M580 153 V180" class="line"/>
+<text x="690" y="172" class="small" text-anchor="middle">HTTPS REST</text>
+<rect x="430" y="183" width="300" height="58" rx="14" fill="#142238" stroke="#39516e" stroke-width="1.5"/>
+<text x="580.0" y="215" class="label" text-anchor="middle">FastAPI</text>
+<path d="M580 241 V266" class="line"/>
+<rect x="390" y="269" width="380" height="58" rx="14" fill="#142238" stroke="#39516e" stroke-width="1.5"/>
+<text x="580.0" y="301" class="label" text-anchor="middle">DataSentinel Workflow</text>
+<text x="850" y="303" class="small" text-anchor="middle">One process · RLock</text>
+<path d="M580 327 V349 H230 V370" class="line"/>
+<path d="M580 327 V370" class="line"/>
+<path d="M580 327 V349 H930 V370" class="line"/>
+<rect x="80" y="373" width="300" height="140" rx="14" fill="#142238" stroke="#39516e" stroke-width="1.5"/>
+<text x="230.0" y="405" class="label" text-anchor="middle">Pipeline Engine</text>
+<text x="230.0" y="433" class="body" text-anchor="middle">Data Generator</text>
+<text x="230.0" y="460" class="body" text-anchor="middle">Pipeline Runner</text>
+<text x="230.0" y="487" class="body" text-anchor="middle">Incident Injector</text>
+<rect x="430" y="373" width="300" height="140" rx="14" fill="#142238" stroke="#39516e" stroke-width="1.5"/>
+<text x="580.0" y="405" class="label" text-anchor="middle">Detection Engine</text>
+<text x="580.0" y="433" class="body" text-anchor="middle">Data Profiler</text>
+<text x="580.0" y="460" class="body" text-anchor="middle">Drift Rules</text>
+<text x="580.0" y="487" class="body" text-anchor="middle">Severity</text>
+<rect x="780" y="373" width="300" height="140" rx="14" fill="#142238" stroke="#39516e" stroke-width="1.5"/>
+<text x="930.0" y="405" class="label" text-anchor="middle">Investigation Engine</text>
+<text x="930.0" y="433" class="body" text-anchor="middle">Evidence Builder</text>
+<text x="930.0" y="460" class="body" text-anchor="middle">Git Analyzer</text>
+<text x="930.0" y="487" class="body" text-anchor="middle">RCA</text>
+<path d="M230 513 V540 H580 V564" class="line"/>
+<path d="M580 513 V564" class="line"/>
+<path d="M930 513 V540 H580 V564" class="line"/>
+<rect x="390" y="568" width="380" height="63" rx="14" fill="#142238" stroke="#39516e" stroke-width="1.5"/>
+<text x="580.0" y="600" class="label" text-anchor="middle">Remediation Engine</text>
+<text x="580.0" y="620" class="body" text-anchor="middle">Propose patch</text>
+<path d="M580 631 V650" class="line"/>
+<rect x="430" y="653" width="300" height="58" rx="14" fill="#382e16" stroke="#eeb856" stroke-width="1.5"/>
+<text x="580.0" y="685" class="label" text-anchor="middle">Human Approval</text>
+<path d="M580 711 V745" class="line"/>
+<text x="745" y="735" class="small" text-anchor="middle">Apply + commit</text>
+<rect x="390" y="748" width="380" height="63" rx="14" fill="#142238" stroke="#39516e" stroke-width="1.5"/>
+<text x="580.0" y="780" class="label" text-anchor="middle">Validation Engine</text>
+<text x="580.0" y="800" class="body" text-anchor="middle">Rerun · Profile · Tests</text>
+<path d="M580 811 V836" class="line"/>
+<text x="730" y="831" class="small" text-anchor="middle">All checks pass</text>
+<rect x="430" y="840" width="300" height="47" rx="14" fill="#142238" stroke="#39516e" stroke-width="1.5"/>
+<text x="580.0" y="872" class="label" text-anchor="middle">Reporter · RESOLVED</text>
+<rect x="1160" y="95" width="380" height="110" rx="14" fill="#142c2b" stroke="#56cbb4" stroke-width="1.5"/>
+<text x="1350.0" y="127" class="label" text-anchor="middle">Persistent Filesystem</text>
+<text x="1350.0" y="155" class="body" text-anchor="middle">JSON state · Data · Artifacts</text>
+<text x="1350.0" y="182" class="body" text-anchor="middle">Single mounted runtime</text>
+<rect x="1160" y="280" width="380" height="132" rx="14" fill="#142c2b" stroke="#56cbb4" stroke-width="1.5"/>
+<text x="1350.0" y="312" class="label" text-anchor="middle">workspace/pipeline_repo</text>
+<text x="1350.0" y="340" class="body" text-anchor="middle">Real monitored Git repository</text>
+<text x="1350.0" y="367" class="body" text-anchor="middle">Regression · Fix · Rollback commits</text>
+<path d="M1080 415 H1120 V345 H1160" class="line" marker-start="url(#arrow)"/>
+<text x="1120" y="260" class="small" text-anchor="middle">Git evidence</text>
+<rect x="1160" y="445" width="380" height="200" rx="14" fill="#142238" stroke="#39516e" stroke-width="1.5"/>
+<text x="1350.0" y="477" class="label" text-anchor="middle">RCA Trust Boundary</text>
+<text x="1350.0" y="505" class="body" text-anchor="middle">Heuristic RCA: source of truth</text>
+<text x="1350.0" y="532" class="body" text-anchor="middle">Optional Anthropic / OpenAI</text>
+<text x="1350.0" y="559" class="body" text-anchor="middle">EvidencePackage only</text>
+<text x="1350.0" y="586" class="body" text-anchor="middle">Grounding → bounded explanations</text>
+<path d="M1080 470 H1135 V490 H1160" class="line"/>
+<rect x="1160" y="710" width="380" height="150" rx="14" fill="#361e29" stroke="#f07a91" stroke-width="1.5"/>
+<text x="1350.0" y="742" class="label" text-anchor="middle">Recovery Path</text>
+<text x="1350.0" y="770" class="body" text-anchor="middle">VALIDATION_FAILED</text>
+<text x="1350.0" y="797" class="body" text-anchor="middle">Operator ROLLBACK → restore commit</text>
+<text x="1350.0" y="824" class="body" text-anchor="middle">Retryable · new approved fix</text>
+<path d="M770 780 H1160" class="line"/>
+<text x="955" y="764" class="small" text-anchor="middle">Validation fails</text>
+<path d="M1160 825 H1100 V598 H770" class="line"/>
+<text x="1035" y="588" class="small" text-anchor="middle">Retry</text>
+<text x="80" y="878" class="small" text-anchor="start">Rollback restores source.</text>
+<text x="80" y="853" class="small">Validation establishes recovery.</text>
+<path d="M770 280 H1095 V150 H1160" class="line"/>
+</svg>

@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-09-26T14:12:19.510Z",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "source": "http://localhost:3010",
+  "provider": "heuristic",
+  "rollback_fixture": true,
+  "fixture_note": "One deliberately failed repository-test check; real workflow, Git commits, rollback and retry.",
+  "captures": [
+    {
+      "file": "healthy.png",
+      "focus": "Status hero"
+    },
+    {
+      "file": "critical.png",
+      "focus": "Status hero"
+    },
+    {
+      "file": "root-cause.png",
+      "focus": "Root cause"
+    },
+    {
+      "file": "git-evidence.png",
+      "focus": "Offending change (git show)"
+    },
+    {
+      "file": "proposed-fix.png",
+      "focus": "Suggested remediation"
+    },
+    {
+      "file": "validation-failed.png",
+      "focus": "Validation"
+    },
+    {
+      "file": "rollback.png",
+      "focus": "Suggested remediation"
+    },
+    {
+      "file": "resolved.png",
+      "focus": "Validation"
+    }
+  ]
+}

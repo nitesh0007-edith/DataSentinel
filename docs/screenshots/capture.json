@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-09-26T16:41:17.753Z",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "source": "https://datasentinel-seven.vercel.app",
+  "provider": "heuristic",
+  "rollback_fixture": false,
+  "unavailable_live_stages": [
+    "validation-failed",
+    "rollback"
+  ],
+  "note": "Correct hosted remediation passes validation; no failure was injected or mocked.",
+  "captures": [
+    {
+      "file": "healthy.png",
+      "focus": "Status hero"
+    },
+    {
+      "file": "critical.png",
+      "focus": "Status hero"
+    },
+    {
+      "file": "root-cause.png",
+      "focus": "Root cause"
+    },
+    {
+      "file": "git-evidence.png",
+      "focus": "Offending change (git show)"
+    },
+    {
+      "file": "proposed-fix.png",
+      "focus": "Suggested remediation"
+    },
+    {
+      "file": "resolved.png",
+      "focus": "Status hero"
+    },
+    {
+      "file": "validation-passed.png",
+      "focus": "Validation"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+flowchart TB
+  UI[Next.js Dashboard] -->|HTTPS REST| API[FastAPI · one process]
+  API --> W[DataSentinel Workflow]
+  W --> P[Pipeline Engine<br/>Data Generator · Pipeline Runner · Incident Injector]
+  W --> D[Detection Engine<br/>Data Profiler · Drift Rules · Severity]
+  W --> I[Investigation Engine<br/>Evidence Builder · Git Analyzer · RCA]
+  P --> R[Remediation Engine · propose patch]
+  D --> R
+  I --> R
+  R --> H{Human approval}
+  H -->|Apply + commit| V[Validation Engine · rerun + profile + tests]
+  V -->|All checks pass| REPORT[Reporter · RESOLVED]
+  REPO[(workspace/pipeline_repo<br/>Real monitored Git repository<br/>Regression · Fix · Rollback commits)] <--> I
+  REPO --> P
+  H -->|Approved apply| REPO
+  W --> DISK[(Persistent filesystem<br/>JSON state · data · artifacts)]
+  I --> HEUR[Heuristic RCA · source of truth]
+  I -->|EvidencePackage only| LLM[Optional Anthropic / OpenAI]
+  LLM --> G[Grounding layer · bounded explanations]
+  HEUR --> G
+  G --> R
+  V -->|VALIDATION_FAILED| RB{Operator rollback}
+  RB --> REST[Restore pre-fix source + commit]
+  REST --> REPO
+  REST -->|Retryable · ROOT_CAUSE_IDENTIFIED| R
+  classDef base fill:#142238,stroke:#39516e,color:#eef5ff
+  classDef human fill:#382e16,stroke:#eeb856,color:#fff4d5
+  classDef recovery fill:#361e29,stroke:#f07a91,color:#fff0f3
+  classDef store fill:#142c2b,stroke:#56cbb4,color:#e9fffa
+  class UI,API,W,P,D,I,R,V,REPORT,HEUR,LLM,G base
+  class H human
+  class RB,REST recovery
+  class REPO,DISK store
