@@ -3,6 +3,7 @@ services:
   - type: web
     name: datasentinel-api
     runtime: docker
+    region: frankfurt
     plan: 1c-2g
     numInstances: 1
     dockerfilePath: ./backend/Dockerfile
