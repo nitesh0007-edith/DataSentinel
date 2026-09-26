@@ -31,6 +31,7 @@ const NEXT_HINT: Record<ActionKey, string> = {
   reject: "",
   apply: "Review the diff, then apply the fix (committed to the pipeline repo).",
   validate: "Validate: rerun the pipeline, re-profile, compare with baseline and run repo tests.",
+  rollback: "Validation failed. Roll back the committed fix to restore the pipeline and retry.",
 };
 
 export default function Dashboard() {
@@ -111,6 +112,10 @@ export default function Dashboard() {
           break;
         case "validate":
           await api.validate(id);
+          break;
+        case "rollback":
+          await api.rollback(id);
+          setNotice("Fix rolled back. Incident is retryable — generate a new fix to proceed.");
           break;
       }
       await refresh();

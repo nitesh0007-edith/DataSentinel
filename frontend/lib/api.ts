@@ -47,6 +47,7 @@ export const api = {
   fix: (id: string) => post(`/api/incidents/${id}/fix`),
   reject: (id: string) => post(`/api/incidents/${id}/reject`),
   apply: (id: string) => post(`/api/incidents/${id}/apply`),
+  rollback: (id: string) => post(`/api/incidents/${id}/rollback`),
   validate: (id: string) => post(`/api/incidents/${id}/validate`),
   report: (id: string) => request<string>(`/api/incidents/${id}/report`),
 };

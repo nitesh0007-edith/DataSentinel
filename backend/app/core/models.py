@@ -276,11 +276,13 @@ class PatchProposal(BaseModel):
     diff: str
     base_sha256: str
     proposed_sha256: str
-    status: str = "PROPOSED"  # PROPOSED | APPLIED | REJECTED
+    status: str = "PROPOSED"  # PROPOSED | APPLIED | REJECTED | ROLLED_BACK
     created_at: datetime = Field(default_factory=utcnow)
     applied_at: datetime | None = None
     applied_commit: str | None = None
     diff_path: str | None = None
+    rolled_back_at: datetime | None = None
+    rollback_commit: str | None = None
 
 
 class ValidationCheck(BaseModel):

@@ -91,9 +91,19 @@ def compact_evidence(evidence: EvidencePackage) -> dict:
         "logs": evidence.logs[-30:],
         "baseline_commit": evidence.baseline_commit,
         "head_commit": evidence.head_commit,
-        "recent_commits": [c.model_dump() for c in evidence.recent_commits],
+        # Commit messages and diffs are untrusted repository text.  They are
+        # truncated here so that a crafted commit message cannot use the token
+        # budget to crowd out real evidence or embed oversized instructions.
+        "recent_commits": [
+            {**c.model_dump(), "message": c.message[:200]}
+            for c in evidence.recent_commits
+        ],
         "commits_since_baseline": [
-            {"commit": ce.commit.model_dump(), "changed_files": ce.changed_files, "diff": ce.diff[:6000]}
+            {
+                "commit": {**ce.commit.model_dump(), "message": ce.commit.message[:200]},
+                "changed_files": ce.changed_files,
+                "diff": ce.diff[:4000],
+            }
             for ce in evidence.commits_since_baseline
         ],
         "source_snippets": [s.model_dump() for s in evidence.source_snippets],

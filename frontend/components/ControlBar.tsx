@@ -13,7 +13,8 @@ export type ActionKey =
   | "fix"
   | "reject"
   | "apply"
-  | "validate";
+  | "validate"
+  | "rollback";
 
 export const ACTION_LABELS: Record<ActionKey, string> = {
   reset: "Reset Demo",
@@ -26,6 +27,7 @@ export const ACTION_LABELS: Record<ActionKey, string> = {
   reject: "Reject Fix",
   apply: "Apply Fix",
   validate: "Validate",
+  rollback: "Roll Back Fix",
 };
 
 export function availability(s: DashboardState | null): Record<ActionKey, boolean> {
@@ -45,6 +47,7 @@ export function availability(s: DashboardState | null): Record<ActionKey, boolea
     reject: open && inc!.patch?.status === "PROPOSED",
     apply: open && inc!.patch?.status === "PROPOSED",
     validate: open && ["FIX_APPLIED", "VALIDATION_FAILED"].includes(inc!.status),
+    rollback: open && inc!.status === "VALIDATION_FAILED" && inc!.patch?.status === "APPLIED",
   };
 }
 
@@ -62,6 +65,8 @@ export function nextAction(s: DashboardState | null): ActionKey | null {
         return "fix";
       case "FIX_PROPOSED":
         return "apply";
+      case "VALIDATION_FAILED":
+        return "rollback";
       default:
         return "validate";
     }
@@ -75,7 +80,7 @@ export function nextAction(s: DashboardState | null): ActionKey | null {
 const FLOW: ActionKey[][] = [
   ["reset", "healthy"],
   ["inject", "run", "detect"],
-  ["investigate", "fix", "reject", "apply", "validate"],
+  ["investigate", "fix", "reject", "apply", "validate", "rollback"],
 ];
 
 export function ControlBar({
@@ -101,7 +106,7 @@ export function ControlBar({
           {group.map((key) => {
             const isNext = key === next && !busy;
             const disabled = !!busy || !avail[key];
-            const danger = key === "inject" || key === "reject";
+            const danger = key === "inject" || key === "reject" || key === "rollback";
             return (
               <span key={key} className="flex items-center gap-2">
                 {key === "inject" && (

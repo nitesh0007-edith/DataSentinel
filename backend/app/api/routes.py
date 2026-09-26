@@ -108,6 +108,11 @@ def apply(incident_id: str, svc: DataSentinelService = Depends(get_service)) -> 
     return svc.apply_fix(incident_id)
 
 
+@router.post("/incidents/{incident_id}/rollback", tags=["remediation"])
+def rollback(incident_id: str, svc: DataSentinelService = Depends(get_service)) -> Incident:
+    return svc.rollback_fix(incident_id)
+
+
 @router.post("/incidents/{incident_id}/validate", tags=["validation"])
 def validate(incident_id: str, svc: DataSentinelService = Depends(get_service)) -> Incident:
     return svc.validate(incident_id)

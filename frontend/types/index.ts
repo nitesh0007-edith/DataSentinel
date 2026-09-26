@@ -159,8 +159,10 @@ export interface PatchProposal {
   commit_reverted: string | null;
   description: string;
   diff: string;
-  status: "PROPOSED" | "APPLIED" | "REJECTED";
+  status: "PROPOSED" | "APPLIED" | "REJECTED" | "ROLLED_BACK";
   applied_commit: string | null;
+  rolled_back_at: string | null;
+  rollback_commit: string | null;
 }
 
 export interface ValidationCheck {

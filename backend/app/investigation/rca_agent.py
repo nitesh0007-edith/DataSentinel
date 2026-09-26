@@ -265,9 +265,27 @@ def ground_llm_result(raw: dict, evidence: EvidencePackage, fallback: RootCauseA
     except (TypeError, ValueError):
         confidence = 0.0
 
+    # Inferences are the only explanatory field taken from the LLM.
+    # Apply strict length and count limits to bound prompt-injection surface.
+    _MAX_INFERENCE_ITEMS = 10
+    _MAX_INFERENCE_LEN = 500
+    raw_inferences = raw.get("inferences")
+    if isinstance(raw_inferences, list):
+        inferences = [
+            str(x)[:_MAX_INFERENCE_LEN]
+            for x in raw_inferences
+            if isinstance(x, str)
+        ][:_MAX_INFERENCE_ITEMS]
+        if not inferences:
+            inferences = fallback.inferences
+    else:
+        inferences = fallback.inferences
+
     return RootCauseAnalysis(
         incident_type=fallback.incident_type,
         severity=fallback.severity,
+        # Consequential operator-facing text always comes from the deterministic
+        # heuristic result, never from raw LLM output.
         likely_root_cause=fallback.likely_root_cause,
         file=file,
         line=line,
@@ -277,8 +295,7 @@ def ground_llm_result(raw: dict, evidence: EvidencePackage, fallback: RootCauseA
         impact=fallback.impact,
         recommended_fix=fallback.recommended_fix,
         observed_facts=fallback.observed_facts,
-        inferences=[str(x) for x in raw.get("inferences", []) if isinstance(x, str)]
-        if isinstance(raw.get("inferences"), list) else fallback.inferences,
+        inferences=inferences,
         insufficient_evidence=fallback.insufficient_evidence,
         engine=f"llm:{label}",
         engine_notes=notes,

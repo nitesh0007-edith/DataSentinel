@@ -42,7 +42,7 @@ from app.pipeline.runner import run_pipeline
 from app.pipeline.workspace import reset_workspace, workspace_git
 from app.profiling.profiler import load_profile, save_profile
 from app.remediation.patch_generator import generate_patch
-from app.remediation.patch_service import apply_patch
+from app.remediation.patch_service import apply_patch, rollback_patch
 from app.reporting.incident_report import write_report
 from app.validation.validator import validate_incident
 
@@ -93,9 +93,25 @@ class DataSentinelService:
         return run, self._profile(run)
 
     def _save_incident(self, state: DemoState, inc: Incident) -> None:
+        """Update incident in memory and register it in the state dict.
+
+        Pure in-memory operation — no file I/O.  Call store.save() and
+        _write_report_safe() separately so a report-write failure cannot
+        prevent the state from being persisted.
+        """
         inc.updated_at = utcnow()
         state.incidents[inc.id] = inc
-        inc.report_path = str(write_report(self.settings, inc))
+
+    def _write_report_safe(self, inc: Incident) -> None:
+        """Write the incident report, updating report_path on success.
+
+        Failures are logged and suppressed — state is already persisted by
+        the time this is called.
+        """
+        try:
+            inc.report_path = str(write_report(self.settings, inc))
+        except OSError as exc:
+            log.warning("Failed to write report for %s (state already saved): %s", inc.id, exc)
 
     # ------------------------------------------------------------ demo lifecycle
     def reset_demo(self, rows: int | None = None, seed: int | None = None) -> DemoState:
@@ -216,6 +232,8 @@ class DataSentinelService:
             else:
                 self._event(state, "detect", f"{run.run_id}: data health {report.data_health.value}.")
             self.store.save(state)
+            if incident is not None:
+                self._write_report_safe(incident)
             return {"detection": report, "incident": incident}
 
     # ------------------------------------------------------------ investigation
@@ -274,6 +292,7 @@ class DataSentinelService:
                         f"{inc.id}: root cause {rca.incident_type.value} in {rca.file}:{rca.line} "
                         f"(confidence {rca.confidence:.0%}, engine {rca.engine}).", inc.severity)
             self.store.save(state)
+            self._write_report_safe(inc)
             return inc
 
     # ------------------------------------------------------------ remediation
@@ -292,6 +311,7 @@ class DataSentinelService:
             self._save_incident(state, inc)
             self._event(state, "fix", f"{inc.id}: patch {patch.patch_id} proposed for {patch.file}. Awaiting approval.")
             self.store.save(state)
+            self._write_report_safe(inc)
             return inc
 
     def reject_fix(self, incident_id: str) -> Incident:
@@ -305,6 +325,7 @@ class DataSentinelService:
             self._save_incident(state, inc)
             self._event(state, "fix", f"{inc.id}: patch {inc.patch.patch_id} rejected by operator.")
             self.store.save(state)
+            self._write_report_safe(inc)
             return inc
 
     def apply_fix(self, incident_id: str) -> Incident:
@@ -313,12 +334,21 @@ class DataSentinelService:
             inc = self._incident(state, incident_id)
             if inc.patch is None:
                 raise ConflictError("Generate a fix before applying it.")
+            # Idempotency guard: a duplicate request that arrives after the first
+            # has already committed the patch returns the already-applied incident
+            # rather than attempting to apply again (which would fail the
+            # is_clean() check or the base_sha256 check in apply_patch anyway, but
+            # this gives a clean, intentional early-return path).
+            if inc.status == IncidentStatus.FIX_APPLIED and inc.patch.status == "APPLIED":
+                log.info("apply_fix called on already-applied incident %s; returning current state.", incident_id)
+                return inc
             itype = inc.rca.incident_type.value if inc.rca else "incident"
             inc.patch = apply_patch(self.settings, inc.patch, itype)
             inc.status = IncidentStatus.FIX_APPLIED
             self._save_incident(state, inc)
             self._event(state, "apply", f"{inc.id}: patch applied and committed as {inc.patch.applied_commit[:7]}.")
             self.store.save(state)
+            self._write_report_safe(inc)
             return inc
 
     # ------------------------------------------------------------ validation
@@ -354,6 +384,46 @@ class DataSentinelService:
                             Severity.CRITICAL)
             self._save_incident(state, inc)
             self.store.save(state)
+            self._write_report_safe(inc)
+            return inc
+
+    def rollback_fix(self, incident_id: str) -> Incident:
+        """Explicitly roll back a committed but failed fix.
+
+        Only allowed when the incident is VALIDATION_FAILED and the patch is
+        APPLIED.  The validation evidence is preserved so the operator can see
+        what checks failed before deciding to retry.  After rollback the
+        incident returns to ROOT_CAUSE_IDENTIFIED so a new fix attempt can
+        be proposed.
+        """
+        with self._lock:
+            state = self.store.load()
+            inc = self._incident(state, incident_id)
+            if inc.status == IncidentStatus.RESOLVED:
+                raise ConflictError(f"{incident_id} is already resolved; cannot roll back.")
+            if inc.status != IncidentStatus.VALIDATION_FAILED:
+                raise ConflictError(
+                    f"{incident_id} is {inc.status.value}; rollback is only allowed after "
+                    "validation has failed."
+                )
+            if inc.patch is None or inc.patch.status != "APPLIED":
+                raise ConflictError(
+                    "No applied patch found on this incident; nothing to roll back."
+                )
+            itype = inc.rca.incident_type.value if inc.rca else "incident"
+            inc.patch = rollback_patch(self.settings, inc.patch, itype)
+            # Reset to ROOT_CAUSE_IDENTIFIED so a new fix can be proposed.
+            # Validation evidence is intentionally preserved on inc.validation.
+            inc.status = IncidentStatus.ROOT_CAUSE_IDENTIFIED
+            self._save_incident(state, inc)
+            self._event(
+                state, "rollback",
+                f"{inc.id}: fix rolled back (commit {inc.patch.rollback_commit[:7]}). "
+                "Validation failure evidence preserved. Incident is retryable.",
+                Severity.WARNING,
+            )
+            self.store.save(state)
+            self._write_report_safe(inc)
             return inc
 
     # ------------------------------------------------------------ reads
