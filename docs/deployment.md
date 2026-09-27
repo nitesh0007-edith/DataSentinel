@@ -44,7 +44,7 @@ exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8000}" --workers 1
 
 1. Import the same GitHub repository into Vercel.
 2. Framework preset: **Next.js**. Root Directory: **frontend**. Install Command: `npm ci`. Build Command: `npm run build` (already expands to `next build --webpack`). Leave Output Directory at the framework default. `frontend/vercel.json` records the framework and commands; Root Directory is a dashboard setting.
-3. Select Node **24.x** in Vercel Project Settings, a supported LTS version meeting Next.js's >=20.9 requirement. Set the production branch to `main`. Release-content changes stay on `release-content` until reviewed and merged. See [Vercel Node versions](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions).
+3. Select Node **24.x** in Vercel Project Settings, a supported LTS version meeting Next.js's >=20.9 requirement. Set the production branch to `main`. The submitted hackathon release is pinned by `v1.0-hackathon`; later documentation commits on `main` do not move that tag. See [Vercel Node versions](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions).
 4. Add `NEXT_PUBLIC_API_URL=https://datasentinel-api-gw7s.onrender.com` under **Settings → Environment Variables**, for **Production**. It is the API base URL, without `/api` and preferably without a trailing slash. It must use HTTPS.
 5. Deploy, record the stable production frontend origin, then update Render's `DATASENTINEL_CORS_ORIGINS` and redeploy the backend.
 6. If you also want Vercel previews, configure their API URL and individually allow the exact preview origins. A preview hostname is not automatically allowed by the production origin.

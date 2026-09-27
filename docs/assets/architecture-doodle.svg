@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1160" viewBox="0 0 1600 1160" role="img" aria-labelledby="title desc">
+<title id="title">DataSentinel architecture — evidence to recovery</title><desc id="desc">Next.js dashboard on Vercel calls FastAPI on Render. A single-process workflow coordinates pipeline execution, profiling, detection, investigation, remediation, validation and reporting. A generated Git repository and persistent JSON/artifacts supply evidence and state. Optional LLM explanations are grounded; failed validation permits operator rollback and retry.</desc>
+<defs>
+<pattern id="paper" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="14" cy="14" r="1" fill="#d7ddd5"/></pattern>
+<marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M2 2 L10 6 L2 10" fill="none" stroke="#243b48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<style>text{font-family:'Trebuchet MS',Arial,sans-serif;fill:#243b48}.note{font-family:'Comic Sans MS','Chalkboard SE',cursive}.line{fill:none;stroke:#243b48;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.arrow{fill:none;stroke:#243b48;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrow)}</style>
+<rect width="1600" height="1160" rx="24" fill="#faf9f2"/><rect width="1600" height="1160" rx="24" fill="url(#paper)"/>
+<path d="M46 32 Q43 580 47 1128" stroke="#e9c8c0" stroke-width="2" fill="none"/>
+<text x="86" y="65" font-size="19" style="fill:#315eaa" font-weight="700" text-anchor="start">INSIDE DATASENTINEL</text>
+<text x="86" y="119" font-size="40" style="fill:#243b48" font-weight="700" text-anchor="start">Evidence → approved repair → verified recovery</text>
+<text x="86" y="159" font-size="24" style="fill:#566b73" font-weight="400" text-anchor="start">One backend process + one instance. Files on disk. No database or queue.</text>
+<text x="1500" y="65" font-size="22" style="fill:#566b73" font-weight="400" text-anchor="end">02</text>
+<rect x="92" y="219" width="420" height="94" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M105 214 Q297 211 489 215 Q508 215 506 233 L508 289 Q507 309 489 307 Q297 310 105 306 Q85 307 88 289 L86 233 Q86 213 105 214Z" fill="#edf2fc" stroke="#315eaa" stroke-width="2"/>
+<g transform="translate(113 236)"><path d="M2 4 h52 v36 H2 Z M2 12 h52 M10 20 h12 v12 H10 Z M30 20 h16 m-16 8 h16" fill="none" stroke="#315eaa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="189" y="251" font-size="27" style="fill:#243b48" font-weight="700" text-anchor="start">Next.js dashboard</text>
+<text x="189" y="283" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">React + TypeScript / Vercel</text>
+<path d="M523 260 H667" class="arrow"/>
+<text x="595" y="238" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="middle">REST</text>
+<rect x="690" y="219" width="435" height="94" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M703 214 Q902 211 1102 215 Q1121 215 1119 233 L1121 289 Q1120 309 1102 307 Q902 310 703 306 Q683 307 686 289 L684 233 Q684 213 703 214Z" fill="#edf2fc" stroke="#315eaa" stroke-width="2"/>
+<text x="711" y="251" font-size="27" style="fill:#243b48" font-weight="700" text-anchor="start">FastAPI backend</text>
+<text x="711" y="283" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Python / Render</text>
+<path d="M902 309 V347" class="arrow"/>
+<rect x="92" y="366" width="1033" height="90" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M105 361 Q603 358 1102 362 Q1121 362 1119 380 L1121 432 Q1120 452 1102 450 Q603 453 105 449 Q85 450 88 432 L86 380 Q86 360 105 361Z" fill="#fff7dc" stroke="#9d843f" stroke-width="2"/>
+<text x="119" y="398" font-size="27" style="fill:#243b48" font-weight="700" text-anchor="start">DataSentinel workflow / services/workflow.py</text>
+<text x="119" y="430" font-size="22" style="fill:#566b73" font-weight="400" text-anchor="start">Coordinates actions, state transitions and process-local locking</text>
+<path d="M505 349 l100 -3 l2 24 l-100 4Z" fill="#e8d79b" opacity=".65"/>
+<path d="M600 453 V478 H250 V502" class="arrow"/>
+<rect x="92" y="514" width="325" height="168" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M105 509 Q249 506 394 510 Q413 510 411 528 L413 658 Q412 678 394 676 Q249 679 105 675 Q85 676 88 658 L86 528 Q86 508 105 509Z" fill="#edf5ed" stroke="#8b9e9e" stroke-width="2"/>
+<text x="107" y="542" font-size="18" style="fill:#315eaa" font-weight="700" text-anchor="start">01 / Profile</text>
+<g transform="translate(340 525)"><path d="M0 16 h12 m32 0 h12 M12 5 h32 v22 H12 Z M20 12 v8 m8 -8 v8 m8 -8 v8" fill="none" stroke="#243b48" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="107" y="585" font-size="24" style="fill:#243b48" font-weight="700" text-anchor="start">Pipeline → profiles</text>
+<text x="107" y="624" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Seeded data; run output</text>
+<text x="107" y="654" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Rows, schema, distributions</text>
+<rect x="445" y="514" width="325" height="168" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M458 509 Q602 506 747 510 Q766 510 764 528 L766 658 Q765 678 747 676 Q602 679 458 675 Q438 676 441 658 L439 528 Q439 508 458 509Z" fill="#edf5ed" stroke="#8b9e9e" stroke-width="2"/>
+<text x="460" y="542" font-size="18" style="fill:#315eaa" font-weight="700" text-anchor="start">02 / Detect</text>
+<g transform="translate(693 525)"><path d="M2 32 v-29 m0 29 h52 M8 25 l10 -9 l10 6 l10 -19 l10 8 M38 3 v8" fill="none" stroke="#243b48" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="460" y="585" font-size="24" style="fill:#243b48" font-weight="700" text-anchor="start">Deterministic checks</text>
+<text x="460" y="624" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Baseline comparison</text>
+<text x="460" y="654" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Anomalies + severity</text>
+<rect x="798" y="514" width="325" height="168" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M811 509 Q955 506 1100 510 Q1119 510 1117 528 L1119 658 Q1118 678 1100 676 Q955 679 811 675 Q791 676 794 658 L792 528 Q792 508 811 509Z" fill="#edf2fc" stroke="#8b9e9e" stroke-width="2"/>
+<text x="813" y="542" font-size="18" style="fill:#315eaa" font-weight="700" text-anchor="start">03 / Investigate</text>
+<g transform="translate(1046 525)"><path d="M16 6 v32 M16 20 h24 v18 M11 6 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0 M11 38 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0 M35 38 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0" fill="none" stroke="#243b48" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="813" y="585" font-size="24" style="fill:#243b48" font-weight="700" text-anchor="start">Git-grounded RCA</text>
+<text x="813" y="624" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Data + run + code evidence</text>
+<text x="813" y="654" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Heuristic root cause</text>
+<rect x="92" y="747" width="325" height="168" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M105 742 Q249 739 394 743 Q413 743 411 761 L413 891 Q412 911 394 909 Q249 912 105 908 Q85 909 88 891 L86 761 Q86 741 105 742Z" fill="#fff7dc" stroke="#8b9e9e" stroke-width="2"/>
+<text x="107" y="775" font-size="18" style="fill:#315eaa" font-weight="700" text-anchor="start">04 / Remediate</text>
+<g transform="translate(340 758)"><path d="M12 8 l-10 12 l10 12 M42 8 l10 12 l-10 12 M23 20 h12 m-6 -6 v12" fill="none" stroke="#243b48" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="107" y="818" font-size="24" style="fill:#243b48" font-weight="700" text-anchor="start">Propose → approve</text>
+<text x="107" y="857" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Preview + human approval</text>
+<text x="107" y="887" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Hash-check, apply + commit</text>
+<rect x="445" y="747" width="325" height="168" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M458 742 Q602 739 747 743 Q766 743 764 761 L766 891 Q765 911 747 909 Q602 912 458 908 Q438 909 441 891 L439 761 Q439 741 458 742Z" fill="#edf5ed" stroke="#8b9e9e" stroke-width="2"/>
+<text x="460" y="775" font-size="18" style="fill:#315eaa" font-weight="700" text-anchor="start">05 / Validate</text>
+<g transform="translate(693 758)"><path d="M6 3 h40 v36 H6 Z M15 20 l8 8 l15 -17" fill="none" stroke="#243b48" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="460" y="818" font-size="24" style="fill:#243b48" font-weight="700" text-anchor="start">Rerun + profile + tests</text>
+<text x="460" y="857" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Pass → RESOLVED</text>
+<text x="460" y="887" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Fail → incident stays open</text>
+<rect x="798" y="747" width="325" height="168" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M811 742 Q955 739 1100 743 Q1119 743 1117 761 L1119 891 Q1118 911 1100 909 Q955 912 811 908 Q791 909 794 891 L792 761 Q792 741 811 742Z" fill="#f3edf8" stroke="#8b9e9e" stroke-width="2"/>
+<text x="813" y="775" font-size="18" style="fill:#315eaa" font-weight="700" text-anchor="start">06 / Report</text>
+<g transform="translate(1046 758)"><path d="M2 4 h52 v36 H2 Z M2 12 h52 M10 20 h12 v12 H10 Z M30 20 h16 m-16 8 h16" fill="none" stroke="#243b48" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="813" y="818" font-size="24" style="fill:#243b48" font-weight="700" text-anchor="start">Incident report</text>
+<text x="813" y="857" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Evidence + timeline</text>
+<text x="813" y="887" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Markdown artifact</text>
+<path d="M415 591 H437" class="arrow"/>
+<path d="M768 591 H790" class="arrow"/>
+<path d="M955 679 V706 H250 V738" class="arrow"/>
+<text x="608" y="730" font-size="20" style="fill:#566b73" font-weight="400" text-anchor="middle">Evidence informs the proposed patch</text>
+<path d="M415 824 H437" class="arrow"/>
+<path d="M768 824 H790" class="arrow"/>
+<rect x="1178" y="366" width="339" height="247" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M1191 361 Q1342 358 1494 362 Q1513 362 1511 380 L1513 589 Q1512 609 1494 607 Q1342 610 1191 606 Q1171 607 1174 589 L1172 380 Q1172 360 1191 361Z" fill="#eaf2ee" stroke="#287860" stroke-width="2"/>
+<text x="1195" y="399" font-size="18" style="fill:#287860" font-weight="700" text-anchor="start">MONITORED GIT REPO</text>
+<g transform="translate(1427 413)"><path d="M16 6 v32 M16 20 h24 v18 M11 6 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0 M11 38 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0 M35 38 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0" fill="none" stroke="#287860" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="1195" y="442" font-size="25" style="fill:#243b48" font-weight="700" text-anchor="start">workspace/</text>
+<text x="1195" y="474" font-size="25" style="fill:#243b48" font-weight="700" text-anchor="start">pipeline_repo</text>
+<text x="1195" y="516" font-size="22" style="fill:#243b48" font-weight="400" text-anchor="start">Real history + diffs</text>
+<text x="1195" y="549" font-size="20" style="fill:#566b73" font-weight="400" text-anchor="start">Regression / fix / rollback</text>
+<text x="1195" y="581" font-size="19" style="fill:#566b73" font-weight="400" text-anchor="start">Rebuilt from template on reset</text>
+<path d="M1130 594 H1161" class="arrow" marker-start="url(#arrow)"/>
+<rect x="1178" y="665" width="339" height="250" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M1191 660 Q1342 657 1494 661 Q1513 661 1511 679 L1513 891 Q1512 911 1494 909 Q1342 912 1191 908 Q1171 909 1174 891 L1172 679 Q1172 659 1191 660Z" fill="#f3edf8" stroke="#82649a" stroke-width="2"/>
+<text x="1195" y="699" font-size="18" style="fill:#735084" font-weight="700" text-anchor="start">PERSISTENT FILESYSTEM</text>
+<text x="1195" y="744" font-size="24" style="fill:#243b48" font-weight="700" text-anchor="start">JSON state + artifacts</text>
+<text x="1195" y="787" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Profiles · logs · reports</text>
+<text x="1195" y="822" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Patch files + backups</text>
+<text x="1195" y="866" font-size="20" style="fill:#566b73" font-weight="400" text-anchor="start">Data + generated repository</text>
+<path d="M1124 405 H1145 V640 H1340 V656" class="arrow"/>
+<rect x="92" y="971" width="500" height="138" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M105 966 Q337 963 569 967 Q588 967 586 985 L588 1085 Q587 1105 569 1103 Q337 1106 105 1102 Q85 1103 88 1085 L86 985 Q86 965 105 966Z" fill="#edf2fc" stroke="#315eaa" stroke-width="2"/>
+<text x="111" y="1000" font-size="18" style="fill:#315eaa" font-weight="700" text-anchor="start">OPTIONAL MODEL EXPLANATIONS</text>
+<text x="111" y="1040" font-size="23" style="fill:#243b48" font-weight="700" text-anchor="start">EvidencePackage → LLM → grounding</text>
+<text x="111" y="1077" font-size="19" style="fill:#566b73" font-weight="400" text-anchor="start">Bounded text; heuristic decisions stay authoritative.</text>
+<rect x="625" y="971" width="892" height="138" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M638 966 Q1066 963 1494 967 Q1513 967 1511 985 L1513 1085 Q1512 1105 1494 1103 Q1066 1106 638 1102 Q618 1103 621 1085 L619 985 Q619 965 638 966Z" fill="#fff0e9" stroke="#b94950" stroke-width="2"/>
+<text x="645" y="1000" font-size="18" style="fill:#b94950" font-weight="700" text-anchor="start">IF A COMMITTED FIX FAILS VALIDATION</text>
+<text x="645" y="1040" font-size="26" style="fill:#243b48" font-weight="700" text-anchor="start">Operator rollback → restore source + commit → retry</text>
+<text x="645" y="1077" font-size="21" style="fill:#566b73" font-weight="400" text-anchor="start">Returns to ROOT_CAUSE_IDENTIFIED. Rollback alone does not prove recovery.</text>
+<text x="87" y="1135" font-size="19" style="fill:#566b73" font-weight="400" text-anchor="start">Conceptual service flow / Reporting also records intermediate incident states.</text>
+</svg>

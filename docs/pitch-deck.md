@@ -1,6 +1,6 @@
 # DataSentinel — Seven-Slide Pitch
 
-Use a 16:9 layout with short text, large numbers and real screenshots. Public demo: https://datasentinel-seven.vercel.app. This document is slide content; no PDF deck has been exported.
+Use a 16:9 layout with short text, large numbers and real screenshots. Public demo: https://datasentinel-seven.vercel.app. This document contains the seven-slide content and speaker notes supporting the completed submission.
 
 ## Slide 1 — DataSentinel
 
@@ -34,7 +34,7 @@ Use a 16:9 layout with short text, large numbers and real screenshots. Public de
 > DATA + RUN + CODE<br>
 > Human approval before apply
 
-**Visual recommendation:** Use the central workflow from [architecture.svg](architecture.svg). Keep the approval boundary visible; omit small module text if projecting.
+**Visual recommendation:** Use the central workflow from the [notebook architecture illustration](assets/architecture-doodle.svg). Keep the approval boundary visible; omit small module text if projecting. The [original presentation diagram](architecture.svg) is also available.
 
 **Speaker notes:** “Profiles and rules establish the anomaly. Run history and real Git evidence help identify the cause. The operator previews and approves the patch. DataSentinel reruns and tests the pipeline before resolving the incident.”
 

@@ -29,8 +29,8 @@ Bob's critic result—no HIGH/CRITICAL blockers and RELEASE READY: YES—is attr
 
 ## Final Content Checks
 
-Script syntax, local Markdown targets, image dimensions/provenance, SVG XML/rendering, public-link consistency and `git diff --check` are checked during this content pass. No application logic or deployment configuration was changed. Nothing is committed or deployed by this task.
+The release content pass checked script syntax, local Markdown targets, image dimensions/provenance, SVG XML/rendering, public-link consistency and `git diff --check`. No application logic or deployment configuration was changed by that pass. This record preserves the historical validation results; later presentation updates do not replace them.
 
-## Remaining Owner Work
+## Submission Context
 
-Record/export the video under five minutes, export the seven-slide deck, and fill the submission form. A GIF/MP4 micro demo is optional. Live recovery screenshots require a genuine failed committed repair; none is manufactured for this release. Review and commit the content branch when satisfied.
+The hackathon submission has been completed. The linked video script and deck content remain as supporting documentation. Live recovery screenshots require a genuine failed committed repair; none was manufactured for this release.

@@ -2,145 +2,117 @@
 
 **Your pipeline can succeed while your data fails.**
 
-[Open the live demo](https://datasentinel-seven.vercel.app)
+[Live Demo](https://datasentinel-seven.vercel.app) · [GitHub Release](https://github.com/nitesh0007-edith/DataSentinel/releases/tag/v1.0-hackathon) · [IBM Bob Evidence](docs/ibm-bob/README.md)
 
-An Autonomous Data Reliability Engineer that connects data, run and code evidence to investigate silent failures and validate an approved repair.
+![DataSentinel: a successful pipeline loses two markets; detection, Git evidence, an approved fix and validation lead to recovery](docs/assets/cover-doodle.svg)
 
-> **Pipeline Status: SUCCESS**<br>
-> **Data Health: CRITICAL**
+DataSentinel investigates silent data failures: it checks output against a healthy baseline, connects anomalies to real Git changes, proposes a repair and validates recovery after an operator approves it.
 
-## The Problem
+**Hackathon MVP** · Synthetic customer data · Heuristic RCA in the public demo · [Recorded validation: 62/62 backend tests](docs/release-validation.md)
 
-Orchestrators tell us whether jobs ran, not whether the output is correct. Narrowed filters, schema drift, null explosions, duplicate ingestion, distribution shifts and broken transformations can all leave a green pipeline producing bad data.
+## The problem: a green job can produce bad data
 
-## The Solution
+A narrowed filter can remove entire markets without raising an exception. The pipeline reports **SUCCESS**, while downstream analytics receive incomplete data. Execution logs alone cannot explain what changed or how to recover.
 
-**DETECT → INVESTIGATE → ROOT CAUSE → PROPOSE → APPLY → VALIDATE → REPORT**
+DataSentinel brings **data profiles + run history + code evidence** into one incident workflow:
 
-DataSentinel compares output with a healthy baseline, correlates anomalies with real Git changes and proposes a repair. An operator approves the patch. Reruns, profile comparisons and repository tests must pass before the incident is resolved. Failed committed remediation supports operator-controlled rollback and retry.
+**DETECT → INVESTIGATE → ROOT CAUSE → PROPOSE FIX → APPLY → VALIDATE → REPORT**
 
-This MVP uses reproducible synthetic customer data. The public demo uses heuristic RCA and needs no external AI key.
+| Step | What makes it useful |
+|---|---|
+| Detect | Deterministic checks calculate row loss, schema changes, nulls, duplicates and distribution drift. |
+| Investigate | Real Git history and diffs connect the anomaly to a likely file, line and commit. |
+| Propose and apply | The operator previews and approves a reverse patch. Python-only targets are confined to the monitored repo and hash-checked before commit. |
+| Validate | Rerun, profile comparisons and repository tests must pass before **RESOLVED**. |
+| Recover safely | A failed committed fix stays open. Operator rollback restores pre-fix source, preserves evidence and allows retry. |
 
-## Live Demo
+Optional LLM explanations are bounded and grounded to an `EvidencePackage`; metrics and heuristic decisions remain authoritative. The hosted demo needs no external model key.
 
-**[Launch DataSentinel](https://datasentinel-seven.vercel.app)**
+## Try the golden path
 
-Click **Reset Demo → Run Healthy Pipeline**, select **Filter regression**, then **Inject Incident → Run Pipeline → Detect → Investigate → Generate Fix → Apply Fix → Validate**.
+**[Open the live demo](https://datasentinel-seven.vercel.app)** and follow the highlighted next action:
 
-[Click-by-click guide](docs/demo.md) · [4:30 video script](docs/demo-video-script.md) · [30-second storyboard](docs/micro-demo.md)
+1. **Reset Demo → Run Healthy Pipeline** to capture a baseline.
+2. Select **Filter regression**, then **Inject Incident → Run Pipeline → Detect**.
+3. **Investigate → Generate Fix** to inspect the Git evidence and proposed repair.
+4. **Apply Fix → Validate** to approve the change and verify recovery.
 
-## Demo Scenario
-
-| Healthy output | Regressed output | Row change | Missing markets |
+| Healthy baseline | Regressed output | Missing markets | Execution / data health |
 |---|---|---|---|
-| 110,000 rows | 43,760 rows | −60.2% | Germany and Italy |
+| 110,000 rows | 43,760 rows (−60.2%) | Germany and Italy | SUCCESS / CRITICAL |
 
-A real commit narrows `country.isin(["UK", "Germany", "Italy"])` to `country == "UK"`. Execution still reports SUCCESS. Detection marks data CRITICAL, and RCA identifies `pipelines/customer_transform.py:46` and the offending commit. The approved reverse patch restores all three countries and validates to RESOLVED.
+The injected commit changes `country.isin(["UK", "Germany", "Italy"])` to `country == "UK"`. Investigation points to `pipelines/customer_transform.py:46` and the actual session commit. The approved reverse patch restores all three countries and validates to **RESOLVED**.
 
-## Screenshots
+[Click-by-click guide](docs/demo.md) · [Video script](docs/demo-video-script.md) · [Short storyboard](docs/micro-demo.md)
 
-Captured from the live application at a consistent 1440 × 1000 viewport. [Capture provenance](docs/screenshots/capture.json) · [Repeatable capture instructions](docs/screenshot-checklist.md).
+## See the evidence
 
-**Silent failure**
+**The silent failure:** the job succeeds, but two countries disappear.
 
-![Successful pipeline with critical data health](docs/screenshots/critical.png)
+![Live dashboard showing SUCCESS execution, CRITICAL data health and missing Germany and Italy](docs/screenshots/critical.png)
 
-**Evidence-grounded root cause**
+<details>
+<summary><strong>Inspect the root cause and validated recovery</strong></summary>
 
-![Source file, line and root-cause explanation](docs/screenshots/root-cause.png)
+**Root cause:** the source file, line and explanation are tied to real Git evidence.
 
-**Proposed repair, awaiting operator approval**
+![Live root-cause view showing the implicated transformation and evidence](docs/screenshots/root-cause.png)
 
-![Proposed reverse patch](docs/screenshots/proposed-fix.png)
+**Recovery:** the approved repair restores the baseline and passes validation.
 
-**Validated recovery**
+![Live resolved incident with healthy data and restored countries](docs/screenshots/resolved.png)
 
-![Resolved incident with healthy data](docs/screenshots/resolved.png)
+</details>
 
-[Healthy baseline](docs/screenshots/healthy.png) · [Real Git diff](docs/screenshots/git-evidence.png) · [Passed validation checks](docs/screenshots/validation-passed.png)
+[Git diff](docs/screenshots/git-evidence.png) · [Patch preview](docs/screenshots/proposed-fix.png) · [Validation checks](docs/screenshots/validation-passed.png) · [Healthy baseline](docs/screenshots/healthy.png)
 
-The correct hosted repair passes validation. Live failed-validation and rollback captures are therefore not claimed; the [capture guide](docs/screenshot-checklist.md) describes the recovery capture limitation.
+These are real hosted captures at 1440 × 1000. [Provenance](docs/screenshots/capture.json) and [capture instructions](docs/screenshot-checklist.md) distinguish hosted evidence from the disclosed local rollback fixture. The normal hosted repair passes; no live failed-validation capture is claimed.
 
 ## Architecture
 
-![DataSentinel architecture](docs/architecture.svg)
+![Notebook diagram of the Next.js dashboard, FastAPI workflow, reliability services, monitored Git repo and persistent artifacts](docs/assets/architecture-doodle.svg)
 
-The dashboard calls FastAPI over REST. A single workflow coordinates simulation, profiling, detection, investigation, remediation, validation and reporting. JSON state, artifacts and the generated monitored repository persist on disk.
+The Next.js dashboard calls FastAPI over REST. One workflow coordinates pipeline execution, profiling, detection, investigation, remediation, validation and reporting. JSON state, data, patches and reports persist on disk.
 
-[Architecture details](docs/architecture.md) · [Mermaid source](docs/architecture.mmd)
+`workspace/pipeline_repo` is a separate, generated **real Git repository**. Regressions, approved fixes and rollbacks create actual commits there. Reset rebuilds it from the checked-in template; do not edit the generated workspace by hand.
 
-## How It Works
+A failed committed fix can return through operator rollback to `ROOT_CAUSE_IDENTIFIED`. Rollback alone does not prove data recovery: a new approved repair must pass validation.
 
-**DATA STATE + RUN STATE + CODE STATE → evidence-grounded RCA**
+[Module map and thresholds](docs/architecture.md) · [Detailed Mermaid diagram](docs/architecture.mmd)
 
-Profiles establish what changed. Run history establishes when it changed and whether execution succeeded. Git history supplies the transformation changes to investigate. Deterministic rules calculate metrics and severity; heuristic RCA correlates those observations with code evidence. Optional model explanations are constrained to the evidence package and grounded before use.
+## Tech stack
 
-## Why Real Git Evidence Matters
+| Layer | Technologies |
+|---|---|
+| Dashboard | Next.js 16, React 19, TypeScript, Tailwind CSS 4 |
+| API and data checks | Python, FastAPI, Pydantic, pandas, NumPy |
+| Evidence and state | Git history/diffs, JSON state, filesystem artifacts |
+| RCA | Deterministic heuristic; optional grounded Anthropic / OpenAI providers |
+| Verification | pytest, TypeScript checking, Next.js production build, Playwright capture tooling |
+| Hosting | Vercel frontend, Render backend with persistent disk |
 
-`workspace/pipeline_repo` is a separate, generated **real Git repository**. Injected regressions, approved fixes and rollbacks create actual commits. RCA cites its history and diffs while DataSentinel’s own application history stays clean. Reset recreates the monitored repository from its checked-in template; never edit the generated workspace manually.
+Five reproducible incidents are included: filter regression, null explosion, duplicate ingestion, schema drift and revenue distribution shift.
 
-## Safety Design
+## IBM Bob contribution
 
-- Deterministic detection and heuristic-first RCA; optional LLM output grounded to evidence.
-- Patch preview and explicit **Apply Fix** approval before modification.
-- Python-only patch targets confined to the monitored repository, with hash checks and backups.
-- Validation must pass before RESOLVED; a failed committed fix remains open.
-- Operator-controlled rollback restores pre-fix source, commits the restoration and permits retry. Rollback itself does not prove healthy data.
-- Exactly one backend process and instance: JSON/filesystem state uses process-local locking.
-- Provider secrets belong only in backend environment settings.
+IBM Bob worked on an **existing working MVP**. It inspected the repository, identified the missing recovery path after committed remediation failed validation, and implemented operator-controlled rollback with frontend controls.
 
-The public app is a shared, resettable synthetic-data demo. Production authentication and tenant isolation are roadmap work.
+Bob also bounded RCA inference and commit/diff text, improved state/report persistence ordering, added duplicate-apply protection and single-worker warnings, expanded regression/adversarial tests, and independently reviewed the diff. Review follow-up removed an unused incident state and corrected the frontend rollback hint.
 
-## Incident Types
+[Eight task-session screenshots](docs/ibm-bob/README.md) · [Repository assessment](improvements-plan.md) · [Implementation commit `8176e22`](https://github.com/nitesh0007-edith/DataSentinel/commit/8176e22aac7675f28ea45d51d00927307a271e45)
 
-| Type | Regression | Detected signal |
-|---|---|---|
-| Filter regression | Three-country filter becomes UK only | Row loss, missing countries, distribution shift |
-| Null explosion | Enterprise sales representatives masked | Null-rate drift |
-| Duplicate ingestion | Replay batch appended again | Duplicates and row growth |
-| Schema drift | Revenue column renamed | Missing/unexpected columns |
-| Revenue distribution shift | Revenue divided by 100 | Numeric distribution shift |
-
-## IBM Bob Contribution
-
-IBM Bob improved an existing working repository; it did **not** build the entire product. Bob initialized and understood the repository, independently assessed reliability and identified a missing recovery path after committed remediation failed validation.
-
-Bob implemented operator-controlled rollback and its frontend flow, hardened RCA trust boundaries, improved state/report persistence ordering and duplicate-apply idempotency, added single-worker deployment warnings, and expanded regression/adversarial tests. It then independently reviewed the implementation. The supplied Bob critic assessment reported **no HIGH/CRITICAL blockers** and **RELEASE READY: YES**.
-
-[Repository assessment](improvements-plan.md); implementation commit `8176e22`.
-
-IBM Bob task-session evidence: [docs/ibm-bob/README.md](docs/ibm-bob/README.md)
-
-## Development Workflow
-
-| Tool | Contribution |
+| Tool | Role in this repository |
 |---|---|
 | Claude Code | Initial working MVP |
-| Codex | Testing, QA, hardening, deployment preparation and release content |
-| IBM Bob | Repository-level reliability engineering and independent critic review |
+| IBM Bob | Repository reliability engineering, hardening, validation and independent review |
+| Codex | QA, hardening, deployment preparation and repository presentation |
 
-## Testing
-
-Verified engineering release: **62/62 backend tests passed**, **TypeScript clean**, **production frontend build passed**. The hosted golden path and restart persistence were verified. [Validation record](docs/release-validation.md).
-
-```sh
-(cd backend && python -m pytest -v)
-python scripts/run_golden_path.py
-(cd frontend && npm run lint && npm run build)
-```
-
-Tests use temporary directories and fake providers. `npm run lint` runs TypeScript checking (`tsc --noEmit`).
-
-## Deployment
-
-Public frontend: **https://datasentinel-seven.vercel.app**. [Technical deployment settings and checks](docs/deployment.md).
-
-## Local Setup
+## Run locally
 
 Prerequisites: Python 3.11+, Node 20.9+ and Git on PATH.
 
 ```sh
-# Backend, terminal 1
+# Terminal 1: backend
 cd backend
 python -m venv .venv
 source .venv/bin/activate
@@ -149,19 +121,47 @@ LLM_PROVIDER=heuristic uvicorn app.main:app --host 127.0.0.1 --port 8000 --worke
 ```
 
 ```sh
-# Frontend, terminal 2
+# Terminal 2: frontend
 cd frontend
 npm ci
 cp .env.local.example .env.local
 npm run dev
 ```
 
-Open http://localhost:3000, then Reset Demo and Run Healthy Pipeline. Run root demo scripts from the repository root, with the backend environment activated. Stop an API process before running scripts against the same runtime directory.
+Open http://localhost:3000, then **Reset Demo → Run Healthy Pipeline**. Backend settings are documented in [.env.example](.env.example); optional provider keys belong only in the backend environment. `DATASENTINEL_HOME` defaults to the repository root, with runtime files under `data/`, `artifacts/` and `workspace/`.
 
-Root `.env.example` documents backend settings. `DATASENTINEL_HOME` defaults to the repository root and `DATASENTINEL_WORKSPACE_DIR` to `<home>/workspace`. CORS uses `DATASENTINEL_CORS_ORIGINS` as a JSON array. Heuristic RCA is the default; optional provider keys belong in an ignored `.env` or backend environment settings, never frontend variables.
+## Testing and validation
 
-## Future Roadmap
+The [26 September validation record](docs/release-validation.md) documents **62/62 backend tests passing**, clean frontend TypeScript checking, a successful production build, and hosted end-to-end recovery and restart persistence. These are recorded results for the validated release, not a claim that every later documentation commit reruns the suite.
 
-Databricks, Airflow, dbt, Snowflake and Azure Data Factory integrations; GitHub correlation, Slack notifications and historical incident memory. Enterprise work includes authentication, isolation and storage/locking suitable for multiple processes. No delivery timelines are claimed.
+```sh
+(cd backend && python -m pytest -v)
+python scripts/run_golden_path.py
+(cd frontend && npm run lint && npm run build)
+```
 
-[Submission copy](docs/submission.md) · [Seven-slide deck content](docs/pitch-deck.md)
+Activate the backend environment and run demo scripts from the repository root. Stop any API process using the same runtime directory before running those scripts. Tests use temporary directories and fake providers; `npm run lint` is `tsc --noEmit`.
+
+## Deployment and scope
+
+**[Public demo on Vercel](https://datasentinel-seven.vercel.app)** · FastAPI on Render with a persistent disk. [Deployment settings and checks](docs/deployment.md).
+
+Use exactly **one backend worker and one service instance**: locking is process-local. The public app is a shared, resettable synthetic-data demo. Authentication, tenant isolation, coordinated storage and production connectors are future work.
+
+## Repository guide
+
+```text
+backend/app/          Workflow, reliability services and API
+backend/tests/        Regression, persistence and adversarial tests
+frontend/             Dashboard, panels and API client
+scripts/              Demo commands and screenshot capture tools
+docs/assets/          Editable notebook-style SVG illustrations
+docs/screenshots/     Hosted captures and isolated local fixture evidence
+docs/ibm-bob/         Selected IBM Bob task-session evidence
+workspace/            Generated monitored Git repo (ignored)
+artifacts/            Runtime state, profiles, patches and reports (ignored)
+```
+
+[Submission narrative](docs/submission.md) · [Pitch-deck content](docs/pitch-deck.md) · [Screenshot tooling](docs/screenshot-checklist.md)
+
+Planned integrations include Databricks, Airflow, dbt, Snowflake and Azure Data Factory, alongside GitHub correlation, Slack notifications and incident history. These connectors are not shipped in this MVP.

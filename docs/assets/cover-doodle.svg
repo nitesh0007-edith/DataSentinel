@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="850" viewBox="0 0 1440 850" role="img" aria-labelledby="title desc">
+<title id="title">DataSentinel — successful pipeline, unhealthy data</title><desc id="desc">Notebook-style illustration of a successful run losing Germany and Italy, followed by deterministic detection, Git evidence, an approved patch, validation and the dashboard. Illustration, not a screenshot.</desc>
+<defs>
+<pattern id="paper" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="14" cy="14" r="1" fill="#d7ddd5"/></pattern>
+<marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M2 2 L10 6 L2 10" fill="none" stroke="#243b48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<style>text{font-family:'Trebuchet MS',Arial,sans-serif;fill:#243b48}.note{font-family:'Comic Sans MS','Chalkboard SE',cursive}.line{fill:none;stroke:#243b48;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.arrow{fill:none;stroke:#243b48;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrow)}</style>
+<rect width="1440" height="850" rx="24" fill="#faf9f2"/><rect width="1440" height="850" rx="24" fill="url(#paper)"/>
+<path d="M46 32 Q43 425 47 818" stroke="#e9c8c0" stroke-width="2" fill="none"/>
+<text x="86" y="62" font-size="19" style="fill:#315eaa" font-weight="700" text-anchor="start">FIELD NOTES / DATA RELIABILITY</text>
+<text x="1350" y="62" font-size="22" style="fill:#566b73" font-weight="400" text-anchor="end">01</text>
+<text x="82" y="166" font-size="82" style="fill:#243b48" font-weight="700" text-anchor="start">DataSentinel</text>
+<path d="M88 184 Q330 196 575 180" stroke="#e7bb54" stroke-width="10" opacity=".6" fill="none"/>
+<text x="86" y="231" font-size="29" style="fill:#243b48" font-weight="400" text-anchor="start">An autonomous data reliability engineer</text>
+<text x="86" y="271" font-size="24" style="fill:#566b73" font-weight="400" text-anchor="start">Your pipeline can succeed while your data fails.</text>
+<rect x="92" y="325" width="545" height="174" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M105 320 Q359 317 614 321 Q633 321 631 339 L633 475 Q632 495 614 493 Q359 496 105 492 Q85 493 88 475 L86 339 Q86 319 105 320Z" fill="#edf5ed" stroke="#287860" stroke-width="2"/>
+<path d="M300 307 l100 -3 l2 24 l-100 4Z" fill="#e8d79b" opacity=".65"/>
+<text x="118" y="363" font-size="19" style="fill:#287860" font-weight="700" text-anchor="start">PIPELINE STATUS</text>
+<text x="118" y="427" font-size="48" style="fill:#287860" font-weight="700" text-anchor="start">SUCCESS</text>
+<text x="118" y="465" font-size="22" style="fill:#566b73" font-weight="400" text-anchor="start">The job ran without an exception.</text>
+<path d="M543 393 l16 17 l32 -37" fill="none" stroke="#287860" stroke-width="5" stroke-linecap="round"/>
+<rect x="740" y="325" width="615" height="174" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M753 320 Q1042 317 1332 321 Q1351 321 1349 339 L1351 475 Q1350 495 1332 493 Q1042 496 753 492 Q733 493 736 475 L734 339 Q734 319 753 320Z" fill="#fff0e9" stroke="#b94950" stroke-width="2"/>
+<path d="M985 307 l100 -3 l2 24 l-100 4Z" fill="#e8d79b" opacity=".65"/>
+<text x="768" y="363" font-size="19" style="fill:#b94950" font-weight="700" text-anchor="start">DATA HEALTH</text>
+<text x="768" y="427" font-size="48" style="fill:#b94950" font-weight="700" text-anchor="start">CRITICAL</text>
+<text x="768" y="465" font-size="22" style="fill:#566b73" font-weight="400" text-anchor="start">Germany + Italy disappeared.</text>
+<circle cx="1294" cy="403" r="19" fill="#b94950"/>
+<path d="M649 402 Q688 390 716 401" class="arrow"/>
+<text x="687" y="371" font-size="22" style="fill:#566b73" font-weight="400" text-anchor="middle" class="note">yet…</text>
+<text x="87" y="549" font-size="29" style="fill:#243b48" font-weight="700" text-anchor="start">110,000 → 43,760 rows</text>
+<text x="650" y="549" font-size="23" style="fill:#566b73" font-weight="400" text-anchor="start">Real Git evidence. Operator approval. Tested recovery.</text>
+<rect x="93" y="595" width="187" height="123" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M106 590 Q181 587 257 591 Q276 591 274 609 L276 694 Q275 714 257 712 Q181 715 106 711 Q86 712 89 694 L87 609 Q87 589 106 590Z" fill="#fffef9" stroke="#97aaa9" stroke-width="2"/>
+<g transform="translate(153 609)"><path d="M0 16 h12 m32 0 h12 M12 5 h32 v22 H12 Z M20 12 v8 m8 -8 v8 m8 -8 v8" fill="none" stroke="#243b48" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="182" y="688" font-size="21" style="fill:#243b48" font-weight="700" text-anchor="middle">Pipeline</text>
+<path d="M281 649 q8 -4 16 0" class="arrow"/>
+<rect x="308" y="595" width="187" height="123" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M321 590 Q396 587 472 591 Q491 591 489 609 L491 694 Q490 714 472 712 Q396 715 321 711 Q301 712 304 694 L302 609 Q302 589 321 590Z" fill="#fffef9" stroke="#97aaa9" stroke-width="2"/>
+<g transform="translate(368 609)"><path d="M2 32 v-29 m0 29 h52 M8 25 l10 -9 l10 6 l10 -19 l10 8 M38 3 v8" fill="none" stroke="#315eaa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="397" y="688" font-size="21" style="fill:#243b48" font-weight="700" text-anchor="middle">Detection</text>
+<path d="M496 649 q8 -4 16 0" class="arrow"/>
+<rect x="523" y="595" width="187" height="123" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M536 590 Q611 587 687 591 Q706 591 704 609 L706 694 Q705 714 687 712 Q611 715 536 711 Q516 712 519 694 L517 609 Q517 589 536 590Z" fill="#fffef9" stroke="#97aaa9" stroke-width="2"/>
+<g transform="translate(583 609)"><path d="M16 6 v32 M16 20 h24 v18 M11 6 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0 M11 38 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0 M35 38 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0" fill="none" stroke="#315eaa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="612" y="688" font-size="21" style="fill:#243b48" font-weight="700" text-anchor="middle">Git evidence</text>
+<path d="M711 649 q8 -4 16 0" class="arrow"/>
+<rect x="738" y="595" width="187" height="123" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M751 590 Q826 587 902 591 Q921 591 919 609 L921 694 Q920 714 902 712 Q826 715 751 711 Q731 712 734 694 L732 609 Q732 589 751 590Z" fill="#fffef9" stroke="#97aaa9" stroke-width="2"/>
+<g transform="translate(798 609)"><path d="M12 8 l-10 12 l10 12 M42 8 l10 12 l-10 12 M23 20 h12 m-6 -6 v12" fill="none" stroke="#243b48" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="827" y="688" font-size="21" style="fill:#243b48" font-weight="700" text-anchor="middle">Approved fix</text>
+<path d="M926 649 q8 -4 16 0" class="arrow"/>
+<rect x="953" y="595" width="187" height="123" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M966 590 Q1041 587 1117 591 Q1136 591 1134 609 L1136 694 Q1135 714 1117 712 Q1041 715 966 711 Q946 712 949 694 L947 609 Q947 589 966 590Z" fill="#fffef9" stroke="#97aaa9" stroke-width="2"/>
+<g transform="translate(1013 609)"><path d="M6 3 h40 v36 H6 Z M15 20 l8 8 l15 -17" fill="none" stroke="#243b48" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="1042" y="688" font-size="21" style="fill:#243b48" font-weight="700" text-anchor="middle">Validation</text>
+<path d="M1141 649 q8 -4 16 0" class="arrow"/>
+<rect x="1168" y="595" width="187" height="123" rx="18" fill="#273d48" opacity=".07"/>
+<path d="M1181 590 Q1256 587 1332 591 Q1351 591 1349 609 L1351 694 Q1350 714 1332 712 Q1256 715 1181 711 Q1161 712 1164 694 L1162 609 Q1162 589 1181 590Z" fill="#fffef9" stroke="#97aaa9" stroke-width="2"/>
+<g transform="translate(1228 609)"><path d="M2 4 h52 v36 H2 Z M2 12 h52 M10 20 h12 v12 H10 Z M30 20 h16 m-16 8 h16" fill="none" stroke="#243b48" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="1257" y="688" font-size="21" style="fill:#243b48" font-weight="700" text-anchor="middle">Dashboard</text>
+<text x="87" y="771" font-size="17" style="fill:#566b73" font-weight="700" text-anchor="start">BUILT WITH</text>
+<text x="249" y="771" font-size="22" style="fill:#243b48" font-weight="400" text-anchor="start">Python · FastAPI · Next.js · TypeScript · Git · Render · Vercel</text>
+<text x="87" y="815" font-size="19" style="fill:#566b73" font-weight="400" text-anchor="start">Synthetic data demo / Human approval before apply / Validation before RESOLVED</text>
+</svg>

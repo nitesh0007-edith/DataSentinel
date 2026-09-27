@@ -48,7 +48,7 @@ flowchart LR
 
 Validation failure keeps the incident open and the applied patch available for an explicit operator rollback. Rollback restores the pre-fix source, records a new commit, preserves failure evidence and returns the incident to `ROOT_CAUSE_IDENTIFIED`. It does not itself claim data recovery. A new proposed and approved fix must pass validation to resolve the incident.
 
-Presentation diagram: [architecture.svg](architecture.svg). Editable Mermaid source: [architecture.mmd](architecture.mmd). Hosting: [deployment.md](deployment.md).
+README illustration: [architecture-doodle.svg](assets/architecture-doodle.svg). The [original presentation diagram](architecture.svg) and [detailed Mermaid source](architecture.mmd) remain available. Hosting: [deployment.md](deployment.md).
 
 Deployment must use one worker and one service instance. The JSON store, generated Git workspace and `threading.RLock` are protected within one process only. Runtime data, state, patches and monitored Git history live on the persistent disk; the application template stays in the deployment image.
 
