@@ -109,6 +109,8 @@ Bob implemented operator-controlled rollback and its frontend flow, hardened RCA
 
 [Repository assessment](improvements-plan.md); implementation commit `8176e22`.
 
+IBM Bob task-session evidence: [docs/ibm-bob/README.md](docs/ibm-bob/README.md)
+
 ## Development Workflow
 
 | Tool | Contribution |
